@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { getSessionAdmin } from "@/lib/auth";
 import { autoSeedDatabase } from "@/lib/seed";
 import { initialProducts } from "@/lib/seedData";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
@@ -89,6 +92,13 @@ export async function POST(req: NextRequest) {
       ...body,
       slug,
     });
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/collection");
+    } catch (e) {
+      console.warn("Revalidate error:", e);
+    }
 
     return NextResponse.json({ success: true, product: newProduct }, { status: 201 });
   } catch (error: any) {

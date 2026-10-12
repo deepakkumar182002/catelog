@@ -22,7 +22,7 @@ export function MetalFinishesSection() {
       name: "MATTE BLACK — STANDARD",
       colorCode: "#121212",
       description: "Our signature electrostatic powder coat. Deep matte texture resistant to fingerprints, everyday handling and abrasion.",
-      image: "",
+      image: "/images/finishes/matte-black.png",
       tag: "Standard Issue",
     },
     {
@@ -30,7 +30,7 @@ export function MetalFinishesSection() {
       name: "GRAPHITE GREY — MODERN",
       colorCode: "#3E4042",
       description: "Subtle industrial charcoal finish offering soft contrast against light woods, raw concrete and neutral architectural environments.",
-      image: "",
+      image: "/images/finishes/graphite-grey.png",
       tag: "Architectural",
     },
     {
@@ -38,7 +38,7 @@ export function MetalFinishesSection() {
       name: "WHITE — CLEAN & MINIMAL",
       colorCode: "#FAFAFA",
       description: "Pristine matte architectural white finish creating bright, open spaces with Scandinavian clarity.",
-      image: "",
+      image: "/images/finishes/white.png",
       tag: "Contemporary",
     },
     {
@@ -46,7 +46,7 @@ export function MetalFinishesSection() {
       name: "CUSTOM COLOUR — ON REQUEST",
       colorCode: "#7A5E4D",
       description: "Custom RAL powder coat formulations matched precisely to your interior designer palette, corporate brand colors or project specifications.",
-      image: "",
+      image: "/images/finishes/custom-colour.png",
       tag: "Bespoke RAL",
     },
   ]);
@@ -64,7 +64,7 @@ export function MetalFinishesSection() {
               name: f.name,
               colorCode: f.colorHex || "#121212",
               description: f.description || "Durable powder-coated finish with premium appearance.",
-              image: f.image?.startsWith("/images/") ? "" : f.image,
+              image: f.image || "",
               tag: f.type === "powder_coat" ? "Powder Coat" : "Custom RAL",
             }));
             setFinishes(mapped);

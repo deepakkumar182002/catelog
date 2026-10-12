@@ -43,7 +43,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, url: result.url, publicId: result.publicId });
     }
 
-    // Fallback: save locally in public/uploads/
+    // In Vercel serverless environments, local disk writes are ephemeral and cannot be served
+    if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        {
+          error:
+            "Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) must be configured in Vercel Project Settings > Environment Variables for persistent uploads.",
+        },
+        { status: 500 }
+      );
+    }
+
+    // Fallback: save locally in public/uploads/ (Local development only)
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });

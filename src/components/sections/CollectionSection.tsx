@@ -33,13 +33,7 @@ export function CollectionSection({ content }: CollectionSectionProps) {
         if (res.ok) {
           const data = await res.json();
           if (data.products && data.products.length > 0) {
-            // Filter out any static /images/ path from products
-            const cleaned = data.products.map((p: any) => ({
-              ...p,
-              heroImage: p.heroImage?.startsWith("/images/") ? "" : p.heroImage,
-              images: (p.images || []).map((img: string) => (img.startsWith("/images/") ? "" : img)),
-            }));
-            setProducts(cleaned);
+            setProducts(data.products);
           }
         }
       } catch (err) {
@@ -108,8 +102,7 @@ export function CollectionSection({ content }: CollectionSectionProps) {
         {/* Collection Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 pt-12">
           {filteredProducts.map((p) => {
-            const rawImage = p.heroImage || p.images[0] || "";
-            const productImage = rawImage.startsWith("/images/") ? "" : rawImage;
+            const productImage = p.heroImage || (p.images && p.images[0]) || "";
 
             return (
               <div

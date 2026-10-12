@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Material } from "@/models/Material";
 import { getSessionAdmin } from "@/lib/auth";
 import { initialMaterials } from "@/lib/seedData";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -33,6 +36,13 @@ export async function POST(req: NextRequest) {
     }
     const body = await req.json();
     const created = await Material.create(body);
+
+    try {
+      revalidatePath("/");
+    } catch (e) {
+      console.warn("Revalidate error:", e);
+    }
+
     return NextResponse.json({ success: true, material: created }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

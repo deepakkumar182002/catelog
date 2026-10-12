@@ -30,7 +30,12 @@ export default function AdminLoginPage() {
         throw new Error(data.error || "Authentication failed.");
       }
 
-      if (typeof window !== "undefined" && window.location.hostname.startsWith("admin.")) {
+      const isSubdomain =
+        typeof window !== "undefined" &&
+        (window.location.hostname.startsWith("admin.") ||
+          window.location.hostname.startsWith("admin-"));
+
+      if (isSubdomain) {
         router.push("/");
       } else {
         router.push("/admin");

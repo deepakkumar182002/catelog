@@ -110,11 +110,11 @@ export const defaultPageContent: PageContentData = {
   heroHeadline: "EXPERIENCE LIFE",
   heroSubheadline: "Furniture for Every Space",
   heroTagline: "Thoughtful designs. Functional spaces. Lasting quality.",
-  heroImage: "",
+  heroImage: "/images/lifestyle/hero-editorial.png",
   b2bHeading: "BUILDING SOMETHING BIGGER?",
   b2bText:
     "Whether you are furnishing an office, developing an interior project, setting up a commercial space or sourcing furniture in quantity, we can discuss the right design, materials, dimensions and finish for your requirement.",
-  b2bImage: "",
+  b2bImage: "/images/lifestyle/about-lifestyle.png",
   whyChooseHeading: "WHY EXPERIENCE LIFE?",
 
   // Design Philosophy
@@ -127,7 +127,7 @@ export const defaultPageContent: PageContentData = {
   philosophyPillar1: "Thoughtful",
   philosophyPillar2: "Functional",
   philosophyPillar3: "Enduring",
-  philosophyImage: "",
+  philosophyImage: "/images/lifestyle/workspace-space.png",
 
   // Catalogue Focus
   featuredTagline: "Catalogue Focus",
@@ -135,35 +135,35 @@ export const defaultPageContent: PageContentData = {
   featuredHeading: "EXECUTIVE WORK DESK",
   featuredDescription:
     "Architectural balance and presence engineered with precision-welded MS square tube framework sustaining daily executive usage.",
-  featuredMainImage: "",
+  featuredMainImage: "/images/products/executive-work-desk.png",
 
   featuredHotspot1Title: "TABLE TOP",
   featuredHotspot1Spec: "Natural Wood Finish • 18–25 mm Thickness",
   featuredHotspot1Desc:
     "Kiln-dried hardwood and natural veneer tops with bevelled edges. Treated with commercial-grade scratch-resistant matte clear coat that preserves natural wood grain warmth.",
   featuredHotspot1Tag: "Surfaces",
-  featuredHotspot1Image: "",
+  featuredHotspot1Image: "/images/details/tabletop-detail.png",
 
   featuredHotspot2Title: "DRAWER SYSTEM",
   featuredHotspot2Spec: "Four Smooth Drawers • Full-Extension Channels",
   featuredHotspot2Desc:
     "Precision telescopic channels allow 100% full-extension access. Constructed with 12mm plywood drawer boxes and integrated flush profile metal handles.",
   featuredHotspot2Tag: "Storage",
-  featuredHotspot2Image: "",
+  featuredHotspot2Image: "/images/details/drawer-detail.png",
 
   featuredHotspot3Title: "METAL FRAME",
   featuredHotspot3Spec: "Strong MS Square-Pipe • Matte Black Coating",
   featuredHotspot3Desc:
     "High-tensile Mild Steel square-tube perimeter framework. Finished in electrostatic matte black powder coat for corrosion resistance and architectural minimalism.",
   featuredHotspot3Tag: "Structure",
-  featuredHotspot3Image: "",
+  featuredHotspot3Image: "/images/details/metalframe-detail.png",
 
   featuredHotspot4Title: "X SUPPORT",
   featuredHotspot4Spec: "Metal Cross-Support • Zero Lateral Deflection",
   featuredHotspot4Desc:
     "Signature industrial X-brace provides structural triangulated reinforcement. Ensures total rock-solid stability even under heavy dual-monitor executive setups.",
   featuredHotspot4Tag: "Stability",
-  featuredHotspot4Image: "",
+  featuredHotspot4Image: "/images/details/xsupport-detail.png",
 
   // Technical Construction
   hardwareTagline: "Technical Construction",
@@ -176,28 +176,28 @@ export const defaultPageContent: PageContentData = {
   hardwareItem1Desc:
     "Heavy-gauge ball-bearing runners providing 100% full extension drawer access, smooth dampening, and high load capacity without sagging.",
   hardwareItem1Detail: "Silent steel ball-bearings",
-  hardwareItem1Image: "",
+  hardwareItem1Image: "/images/hardware/telescopic-channel.png",
 
   hardwareItem2Title: "DRAWER BOX CONSTRUCTION",
   hardwareItem2Spec: "12 MM SIDES • 6 MM BOTTOM",
   hardwareItem2Desc:
     "Engineered from calibrated structural marine-grade plywood with interlocking joints, ensuring lifetime squareness under heavy storage loads.",
   hardwareItem2Detail: "Calibrated Birch / Hardwood Ply",
-  hardwareItem2Image: "",
+  hardwareItem2Image: "/images/hardware/drawer-box.png",
 
   hardwareItem3Title: "HANDLE OPTIONS",
   hardwareItem3Spec: "BLACK METAL / PROFILE HANDLE",
   hardwareItem3Desc:
     "Minimalist aluminum and steel J-profile and edge-mount handles, powder-coated in matte black to integrate seamlessly into drawer faces.",
   hardwareItem3Detail: "Ergonomic flush grip profile",
-  hardwareItem3Image: "",
+  hardwareItem3Image: "/images/hardware/profile-handle.png",
 
   hardwareItem4Title: "SIDE CABINET PANEL",
   hardwareItem4Spec: "18 MM PLYWOOD • MATTE BLACK FINISH",
   hardwareItem4Desc:
     "Substantial 18mm plywood perimeter side casing with seamless polyurethane edge banding, safeguarding the pedestal against daily scuffs.",
   hardwareItem4Detail: "Impact-resistant matte casing",
-  hardwareItem4Image: "",
+  hardwareItem4Image: "/images/hardware/side-cabinet.png",
 
   // Orthographic Projections
   dimensionsTagline: "Orthographic Projections",
@@ -205,10 +205,10 @@ export const defaultPageContent: PageContentData = {
   dimensionsHeading: "DIMENSIONS",
   dimensionsSubheading:
     "Standard size with custom dimensional scaling available to match specific architectural room layouts.",
-  dimensionsBlueprintImage: "",
-  dimensionsFrontImage: "",
-  dimensionsSideImage: "",
-  dimensionsTopImage: "",
+  dimensionsBlueprintImage: "/images/technical/desk-dimensions.png",
+  dimensionsFrontImage: "/images/technical/desk-front-view.png",
+  dimensionsSideImage: "/images/technical/desk-side-view.png",
+  dimensionsTopImage: "/images/technical/desk-top-view.png",
 
   // Collection 2026
   collectionTagline: "Collection 2026 • Architectural Furniture",
@@ -226,6 +226,18 @@ export const defaultPageContent: PageContentData = {
     "It should work with the space, support the way people use it and remain visually relevant over time.",
   aboutParagraph3:
     "We focus on modern forms, practical functionality, strong construction and material combinations that bring warmth and character to everyday spaces.",
-  aboutImage: "",
-  aboutSecondaryImage: "",
+  aboutImage: "/images/lifestyle/craftsmanship.png",
+  aboutSecondaryImage: "/images/lifestyle/about-lifestyle.png",
 };
+
+export function mergePageContent(saved?: Record<string, any> | null): PageContentData {
+  if (!saved) return { ...defaultPageContent };
+  const merged: any = { ...defaultPageContent };
+  for (const key of Object.keys(defaultPageContent) as (keyof PageContentData)[]) {
+    const val = saved[key];
+    if (typeof val === "string" && val.trim().length > 0) {
+      merged[key] = val.trim();
+    }
+  }
+  return merged;
+}

@@ -19,7 +19,10 @@ import { EnquirySection } from "@/components/sections/EnquirySection";
 import { Footer } from "@/components/Footer";
 import { connectDB } from "@/lib/db";
 import { PageContent } from "@/models/PageContent";
-import { defaultPageContent } from "@/lib/pageDefaults";
+import { defaultPageContent, mergePageContent } from "@/lib/pageDefaults";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 async function getPageContent() {
   try {
@@ -27,15 +30,9 @@ async function getPageContent() {
     if (!db) return defaultPageContent;
     const doc = await PageContent.findOne();
     if (!doc) return defaultPageContent;
-    const data: any = { ...defaultPageContent, ...doc.toObject() };
-    for (const key of Object.keys(data)) {
-      if (typeof data[key] === "string" && data[key].startsWith("/images/")) {
-        data[key] = "";
-      }
-    }
-    return data;
+    return mergePageContent(doc.toObject());
   } catch (error) {
-    console.warn("Using default page content due to DB disconnect");
+    console.warn("Using default page content due to DB disconnect:", error);
     return defaultPageContent;
   }
 }

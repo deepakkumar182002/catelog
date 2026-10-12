@@ -24,6 +24,9 @@ interface ProductPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function generateStaticParams() {
   return initialProducts.map((p: SeedProduct) => ({
     slug: p.slug,
@@ -54,9 +57,8 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  // Clean static /images/ path
-  const heroImage = product.heroImage?.startsWith("/images/") ? "" : product.heroImage;
-  const images = (product.images || []).map((img: string) => (img.startsWith("/images/") ? "" : img));
+  const heroImage = product.heroImage || (product.images && product.images[0]) || "";
+  const images = (product.images && product.images.length > 0) ? product.images : (heroImage ? [heroImage] : []);
 
   const relatedProducts = initialProducts.filter((p: SeedProduct) => p.slug !== slug).slice(0, 3);
 

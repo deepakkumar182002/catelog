@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Loader2, ImageOff, ImageIcon } from "lucide-react";
 
@@ -34,6 +34,11 @@ export function BackendImage({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
+  useEffect(() => {
+    setIsLoading(true);
+    setHasError(false);
+  }, [src]);
+
   // If no source is provided from backend or explicitly empty, show clean architectural loader/placeholder
   const hasValidSrc = Boolean(src && typeof src === "string" && src.trim().length > 0);
 
@@ -60,6 +65,14 @@ export function BackendImage({
 
   const cleanSrc = src!.trim();
   const isExternal = cleanSrc.startsWith("http://") || cleanSrc.startsWith("https://");
+  let finalSrc = cleanSrc;
+  if (isExternal) {
+    try {
+      finalSrc = encodeURI(decodeURI(cleanSrc));
+    } catch {
+      finalSrc = cleanSrc;
+    }
+  }
 
   return (
     <div
@@ -78,7 +91,7 @@ export function BackendImage({
 
       {/* Actual Image from Backend */}
       <Image
-        src={cleanSrc}
+        src={finalSrc}
         alt={alt || "Product visual"}
         fill={fill}
         width={!fill ? width : undefined}

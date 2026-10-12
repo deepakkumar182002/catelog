@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/models/Product";
 import { getSessionAdmin } from "@/lib/auth";
 import { initialProducts } from "@/lib/seedData";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(
   _req: NextRequest,
@@ -68,6 +71,14 @@ export async function PUT(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
+    try {
+      revalidatePath("/");
+      revalidatePath("/collection");
+      if (updated.slug) revalidatePath(`/collection/${updated.slug}`);
+    } catch (e) {
+      console.warn("Revalidate error:", e);
+    }
+
     return NextResponse.json({ success: true, product: updated });
   } catch (error: any) {
     console.error("Product update error:", error);
@@ -98,6 +109,14 @@ export async function DELETE(
     const deleted = await Product.findOneAndDelete(query);
     if (!deleted) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/collection");
+      if (deleted.slug) revalidatePath(`/collection/${deleted.slug}`);
+    } catch (e) {
+      console.warn("Revalidate error:", e);
     }
 
     return NextResponse.json({ success: true, message: "Product deleted successfully" });

@@ -24,11 +24,7 @@ export function GallerySection() {
         if (res.ok) {
           const data = await res.json();
           if (data.gallery && data.gallery.length > 0) {
-            const cleaned = data.gallery.map((g: any) => ({
-              ...g,
-              image: g.image?.startsWith("/images/") ? "" : g.image,
-            }));
-            setItems(cleaned);
+            setItems(data.gallery);
           }
         }
       } catch {

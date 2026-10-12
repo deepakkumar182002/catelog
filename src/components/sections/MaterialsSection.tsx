@@ -21,28 +21,28 @@ export function MaterialsSection() {
       name: "OAK",
       tagline: "Light Natural Wood Grain",
       description: "Gentle Scandinavian warmth with light, tight grain structures. Ideal for open, naturally lit modern workspaces.",
-      image: "",
+      image: "/images/materials/oak.png",
       tone: "#D8C7A5",
     },
     {
       name: "TEAK",
       tagline: "Warm Golden Wood Tone",
       description: "Timeless golden-brown hues celebrated for natural oil richness, structural density and enduring character over generations.",
-      image: "",
+      image: "/images/materials/teak.png",
       tone: "#B7864B",
     },
     {
       name: "WALNUT",
       tagline: "Rich Premium Dark Wood Grain",
       description: "Deep, sophisticated dark chocolate tones with expressive grain figure. Standard choice for executive luxury environments.",
-      image: "",
+      image: "/images/materials/walnut.png",
       tone: "#5B4028",
     },
     {
       name: "SHEESHAM",
       tagline: "Natural Indian Hardwood Character",
       description: "Dramatic contrasting grain patterns and high physical hardness. Imparts unmistakable organic individuality to each desktop.",
-      image: "",
+      image: "/images/materials/sheesham.png",
       tone: "#8A542D",
     },
   ]);
@@ -58,7 +58,7 @@ export function MaterialsSection() {
               name: m.name,
               tagline: m.description ? m.description.slice(0, 40) : "Architectural Wood Finish",
               description: m.description || "Premium architectural surface finish.",
-              image: m.image?.startsWith("/images/") ? "" : m.image,
+              image: m.image || "",
               tone: m.tone || "#B7864B",
             }));
             setWoods(mapped);
