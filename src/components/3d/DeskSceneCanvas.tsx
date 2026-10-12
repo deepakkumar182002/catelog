@@ -6,8 +6,11 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import { ExecutiveDeskModel } from "./ExecutiveDeskModel";
 
+import { WoodSpecies } from "@/lib/woodTextures";
+
 interface DeskSceneCanvasProps {
   woodColor?: string;
+  woodSpecies?: WoodSpecies;
   frameColor?: string;
   drawerOpenOffset?: number;
   interactive?: boolean;
@@ -16,7 +19,8 @@ interface DeskSceneCanvasProps {
 }
 
 export function DeskSceneCanvas({
-  woodColor = "#A87C4F",
+  woodColor = "#B8864E",
+  woodSpecies,
   frameColor = "#1A1A1A",
   drawerOpenOffset = 0,
   interactive = true,
@@ -48,6 +52,7 @@ export function DeskSceneCanvas({
           {/* 3D Desk Model */}
           <ExecutiveDeskModel
             woodColor={woodColor}
+            woodSpecies={woodSpecies}
             frameColor={frameColor}
             drawerOpenOffset={drawerOpenOffset}
           />

@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import Image from "next/image";
-import dynamic from "next/dynamic";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { ExecutiveDeskModel } from "./ExecutiveDeskModel";
 import { ContactShadows } from "@react-three/drei";
-import { Rotate3d, Eye, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { Rotate3d } from "lucide-react";
+import { WOOD_OPTIONS, WoodSpecies } from "@/lib/woodTextures";
 
 // Scroll camera controller
 function ScrollCameraController({ scrollProgress }: { scrollProgress: number }) {
@@ -38,9 +37,9 @@ function ScrollCameraController({ scrollProgress }: { scrollProgress: number }) 
 export function HeroScroll3D() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [is3DReady, setIs3DReady] = useState(false);
-  const [selectedWood, setSelectedWood] = useState("#A87C4F"); // Teak/Oak tone
+  const [selectedWood, setSelectedWood] = useState<WoodSpecies>("teak");
   const [selectedFrame, setSelectedFrame] = useState("#1A1A1A"); // Matte Black
-  const [manualDrawerOpen, setManualDrawerOpen] = useState(0);
+  const [manualDrawerOverride, setManualDrawerOverride] = useState<boolean | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,8 +67,15 @@ export function HeroScroll3D() {
     };
   }, []);
 
-  // Drawer opens when user scrolls past 50%
-  const computedDrawer = Math.max(manualDrawerOpen, scrollProgress > 0.4 ? (scrollProgress - 0.4) * 1.6 : 0);
+  // Compute drawer slide offset [0 to 1]
+  const computedDrawer =
+    manualDrawerOverride !== null
+      ? (manualDrawerOverride ? 1 : 0)
+      : (scrollProgress > 0.4 ? Math.min((scrollProgress - 0.4) * 2.2, 1) : 0);
+
+  const isDrawerOpen = computedDrawer > 0.3;
+
+  const currentWoodDef = WOOD_OPTIONS.find((w) => w.id === selectedWood) || WOOD_OPTIONS[0];
 
   return (
     <div ref={containerRef} className="relative w-full h-[180vh] md:h-[220vh] bg-[#FAF8F5]">
@@ -94,7 +100,7 @@ export function HeroScroll3D() {
           </div>
         </div>
 
-        {/* 3D Canvas / Fallback Poster Container */}
+        {/* 3D Canvas Container */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
           {/* Fallback loader for 3D initialization */}
           {!is3DReady && (
@@ -128,7 +134,7 @@ export function HeroScroll3D() {
                 <ScrollCameraController scrollProgress={scrollProgress} />
 
                 <ExecutiveDeskModel
-                  woodColor={selectedWood}
+                  woodSpecies={selectedWood}
                   frameColor={selectedFrame}
                   drawerOpenOffset={computedDrawer}
                 />
@@ -149,17 +155,17 @@ export function HeroScroll3D() {
         {/* Floating Scroll Hotspot Annotations based on scroll depth */}
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-end gap-6 pointer-events-none">
           {/* Dynamic Scroll Stage Indicator */}
-          <div className="bg-white/90 backdrop-blur-md p-4 rounded-xl border border-stone-200/80 shadow-lg max-w-sm pointer-events-auto transition-all duration-500">
+          <div className="bg-white/95 backdrop-blur-md p-4 rounded-xl border border-stone-200/80 shadow-lg max-w-sm pointer-events-auto transition-all duration-500">
             {scrollProgress < 0.35 && (
               <div>
                 <p className="text-[10px] font-mono uppercase text-amber-700 tracking-wider font-semibold">
-                  Phase 01 / Proportions
+                  Phase 01 / Proportions & Grain
                 </p>
                 <h3 className="text-sm font-semibold text-stone-900 mt-1">
-                  Architectural Balance & Presence
+                  Architectural Balance & Natural Hardwood
                 </h3>
                 <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                  5 ft length × 2 ft width × 2.5 ft height. Precision-welded MS square tube framework sustaining daily executive usage.
+                  5 ft length × 2 ft width × 2.5 ft height. Real grain texture with natural annular rings and precision-welded steel framework.
                 </p>
               </div>
             )}
@@ -187,57 +193,84 @@ export function HeroScroll3D() {
                   Four Full-Extension Drawers
                 </h3>
                 <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-                  16–20 inch telescopic channels with 12mm plywood drawer boxes and flush matte profile handles.
+                  Heavy-duty telescopic slide channels with birch plywood interior drawer box and flush profile handles.
                 </p>
               </div>
             )}
 
             {/* Quick interactive controls */}
-            <div className="mt-3 pt-3 border-t border-stone-100 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-mono text-stone-500 uppercase">Wood:</span>
-                {[
-                  { name: "Teak", color: "#A87C4F" },
-                  { name: "Walnut", color: "#533B2B" },
-                  { name: "Oak", color: "#CBB393" },
-                ].map((w) => (
-                  <button
-                    key={w.name}
-                    title={w.name}
-                    onClick={() => setSelectedWood(w.color)}
-                    className={`w-4 h-4 rounded-full border transition-all ${
-                      selectedWood === w.color ? "scale-125 border-stone-900 shadow-sm" : "border-stone-300"
-                    }`}
-                    style={{ backgroundColor: w.color }}
-                  />
-                ))}
+            <div className="mt-3 pt-3 border-t border-stone-100 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                {/* Wood selector */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-mono text-stone-500 uppercase">
+                    Wood ({currentWoodDef.name}):
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {WOOD_OPTIONS.map((w) => {
+                      const isSelected = selectedWood === w.id;
+                      return (
+                        <button
+                          key={w.id}
+                          type="button"
+                          title={`${w.name} - ${w.subtitle}`}
+                          onClick={() => setSelectedWood(w.id)}
+                          className={`w-4 h-4 rounded-full border transition-all duration-150 ${
+                            isSelected
+                              ? "scale-125 ring-2 ring-stone-900 ring-offset-1 border-white shadow-sm"
+                              : "border-stone-300 hover:scale-110"
+                          }`}
+                          style={{ backgroundColor: w.color }}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Frame selector */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-mono text-stone-500 uppercase">Frame:</span>
+                  {[
+                    { name: "Matte Black", color: "#1A1A1A" },
+                    { name: "Graphite", color: "#3E4042" },
+                    { name: "White", color: "#F0EFEA" },
+                  ].map((f) => (
+                    <button
+                      key={f.name}
+                      type="button"
+                      title={f.name}
+                      onClick={() => setSelectedFrame(f.color)}
+                      className={`w-4 h-4 rounded-full border transition-all duration-150 ${
+                        selectedFrame === f.color ? "scale-125 ring-2 ring-stone-900 ring-offset-1 border-white shadow-sm" : "border-stone-300"
+                      }`}
+                      style={{ backgroundColor: f.color }}
+                    />
+                  ))}
+                </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-mono text-stone-500 uppercase">Frame:</span>
-                {[
-                  { name: "Matte Black", color: "#1A1A1A" },
-                  { name: "Graphite", color: "#3E4042" },
-                  { name: "White", color: "#F0EFEA" },
-                ].map((f) => (
-                  <button
-                    key={f.name}
-                    title={f.name}
-                    onClick={() => setSelectedFrame(f.color)}
-                    className={`w-4 h-4 rounded-full border transition-all ${
-                      selectedFrame === f.color ? "scale-125 border-stone-900 shadow-sm" : "border-stone-300"
+              {/* Drawer Toggle Button */}
+              <div className="flex items-center justify-between pt-1 border-t border-stone-100">
+                <span className="text-[10px] font-mono text-stone-500 uppercase">
+                  Drawer Mechanism:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setManualDrawerOverride(isDrawerOpen ? false : true)}
+                  className={`text-[11px] font-mono uppercase px-2.5 py-1 rounded transition-all duration-200 flex items-center gap-1.5 ${
+                    isDrawerOpen
+                      ? "bg-stone-900 text-white shadow-sm"
+                      : "bg-stone-100 hover:bg-stone-200 text-stone-800"
+                  }`}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      isDrawerOpen ? "bg-amber-400 animate-pulse" : "bg-stone-400"
                     }`}
-                    style={{ backgroundColor: f.color }}
                   />
-                ))}
+                  {isDrawerOpen ? "Close Drawer" : "Open Drawer"}
+                </button>
               </div>
-
-              <button
-                onClick={() => setManualDrawerOpen(manualDrawerOpen > 0 ? 0 : 1)}
-                className="text-[11px] font-mono uppercase text-stone-700 bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded transition-colors"
-              >
-                {manualDrawerOpen > 0 ? "Close Drawer" : "Open Drawer"}
-              </button>
             </div>
           </div>
 

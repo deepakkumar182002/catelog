@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 import { Navbar } from "@/components/Navbar";
-import { HeroSection } from "@/components/sections/HeroSection";
-import { HeroScroll3D } from "@/components/3d/HeroScroll3D";
+import { Hero3DRoomExperience } from "@/components/3d/Hero3DRoomExperience";
 import { IntroSection } from "@/components/sections/IntroSection";
 import { FeaturedProductSection } from "@/components/sections/FeaturedProductSection";
 import { MaterialsSection } from "@/components/sections/MaterialsSection";
@@ -46,11 +45,8 @@ export default async function HomePage() {
       <Navbar />
 
       <main>
-        {/* 1. Hero Section */}
-        <HeroSection content={content} />
-
-        {/* 2. Interactive 3D Scroll Experience */}
-        <HeroScroll3D />
+        {/* 1. Scroll-Driven 3D Room Experience (Software Engineer & Architect Studio) */}
+        <Hero3DRoomExperience content={content} />
 
         {/* 3. Brand Story & Philosophy (Dynamic Admin Editable) */}
         <IntroSection content={content} />
