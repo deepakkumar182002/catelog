@@ -38,7 +38,7 @@ export function HeroScroll3D() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [is3DReady, setIs3DReady] = useState(false);
   const [selectedWood, setSelectedWood] = useState<WoodSpecies>("teak");
-  const [selectedFrame, setSelectedFrame] = useState("#1A1A1A"); // Matte Black
+  const [selectedFrame, setSelectedFrame] = useState("#B4BCC6"); // Matte Black
   const [manualDrawerOverride, setManualDrawerOverride] = useState<boolean | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 

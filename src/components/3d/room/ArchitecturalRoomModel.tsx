@@ -4,7 +4,7 @@ import React, { useRef, useMemo } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { WoodSpecies, getWoodMaterialConfig } from "@/lib/woodTextures";
-import { getFloorTexture, getMonitorTexture } from "@/lib/roomTextures";
+import { getFloorTexture, getMonitorTexture, getMacMiniTopTexture } from "@/lib/roomTextures";
 import { CoffeeSteam } from "./CoffeeSteam";
 // import { PlantStand } from "./PlantStand"; // removed per user request
 import { WallShelves } from "./WallShelves";
@@ -58,15 +58,17 @@ interface ArchitecturalRoomModelProps {
   isLampOn?: boolean;
   screenMode?: "clock" | "code";
   chairRotation?: number;
+  currentTime?: Date;
 }
 
 export function ArchitecturalRoomModel({
   woodSpecies = "teak",
-  tableFrameColor = "black",
+  tableFrameColor = "silver",
   drawerOpenOffset = 0,
   isLampOn = true,
   screenMode = "clock",
-  chairRotation = 2.15, // Swiveled 60 degrees towards the screen/viewer
+  chairRotation = 2.15,
+  currentTime,
 }: ArchitecturalRoomModelProps) {
   const drawerRef = useRef<THREE.Group>(null);
   const chairRef = useRef<THREE.Group>(null);
@@ -85,7 +87,7 @@ export function ArchitecturalRoomModel({
   }, [woodConfig]);
 
   // 2. Dynamic Table Framework Metal Material
-  const frameConfig = TABLE_FRAME_CONFIG[tableFrameColor] || TABLE_FRAME_CONFIG.black;
+  const frameConfig = TABLE_FRAME_CONFIG[tableFrameColor] || TABLE_FRAME_CONFIG.silver;
   const tableFrameMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       color: new THREE.Color(frameConfig.color),
@@ -219,6 +221,15 @@ export function ArchitecturalRoomModel({
     });
   }, []);
 
+  const macMiniTopTexture = useMemo(() => getMacMiniTopTexture(), []);
+  const macMiniTopMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      map: macMiniTopTexture || undefined,
+      roughness: 0.25,
+      metalness: 0.85,
+    });
+  }, [macMiniTopTexture]);
+
   // 7. Apple Keycaps Material (Contrasting low-profile dark chiclet keys)
   const appleKeycapMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
@@ -238,7 +249,7 @@ export function ArchitecturalRoomModel({
   }, []);
 
   // 9. Apple Studio Display Screen
-  const monitorTexture = useMemo(() => getMonitorTexture(screenMode), [screenMode]);
+  const monitorTexture = useMemo(() => getMonitorTexture(screenMode, currentTime), [screenMode, currentTime]);
   const monitorScreenMaterial = useMemo(() => {
     return new THREE.MeshStandardMaterial({
       map: monitorTexture || undefined,
@@ -249,6 +260,32 @@ export function ArchitecturalRoomModel({
       emissiveIntensity: 0.92,
     });
   }, [monitorTexture]);
+
+  // Desk Lamp Materials
+  const lampBodyMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: new THREE.Color("#1B1D1F"),
+      roughness: 0.35,
+      metalness: 0.85,
+    });
+  }, []);
+
+  const lampBrassAccentMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: new THREE.Color("#D4AF37"),
+      roughness: 0.25,
+      metalness: 0.9,
+    });
+  }, []);
+
+  const lampBulbMaterial = useMemo(() => {
+    return new THREE.MeshStandardMaterial({
+      color: isLampOn ? new THREE.Color("#FFF2D1") : new THREE.Color("#666666"),
+      emissive: isLampOn ? new THREE.Color("#FFA834") : new THREE.Color("#000000"),
+      emissiveIntensity: isLampOn ? 4.5 : 0,
+      roughness: 0.1,
+    });
+  }, [isLampOn]);
 
   // 10. Ergonomic Office Chair Mesh Fabric
   const chairMeshMaterial = useMemo(() => {
@@ -576,21 +613,141 @@ export function ArchitecturalRoomModel({
           </mesh>
         </group>
 
-        {/* APPLE MAC MINI (Positioned beside monitor stand) */}
-        <group position={[-0.42, 0.018, -0.22]}>
+        {/* ARCHITECTURAL DESIGNER DESK LAMP (Moved to left distance, attractive clean shade) */}
+        <group position={[-0.72, 0, -0.10]}>
+          {/* Heavy Weighted Circular Base with Brass Chamfer Rim */}
+          <mesh position={[0, 0.007, 0]} castShadow receiveShadow>
+            <cylinderGeometry args={[0.068, 0.075, 0.014, 32]} />
+            <primitive object={lampBodyMaterial} attach="material" />
+          </mesh>
+          <mesh position={[0, 0.002, 0]}>
+            <cylinderGeometry args={[0.076, 0.077, 0.005, 32]} />
+            <primitive object={lampBrassAccentMaterial} attach="material" />
+          </mesh>
+          {/* Brass rotary switch dial */}
+          <mesh position={[0.035, 0.016, 0.025]} castShadow>
+            <cylinderGeometry args={[0.006, 0.006, 0.009, 16]} />
+            <primitive object={lampBrassAccentMaterial} attach="material" />
+          </mesh>
+
+          {/* Lower Cantilever Stem (Angled gracefully inward) */}
+          <group position={[-0.008, 0.014, -0.008]} rotation={[0.10, -0.25, 0.12]}>
+            <mesh position={[0, 0.16, 0]} castShadow>
+              <cylinderGeometry args={[0.005, 0.005, 0.32, 16]} />
+              <primitive object={lampBodyMaterial} attach="material" />
+            </mesh>
+
+            {/* Mid Articulation Brass Knuckle */}
+            <group position={[0, 0.32, 0]}>
+              <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+                <cylinderGeometry args={[0.013, 0.013, 0.022, 16]} />
+                <primitive object={lampBrassAccentMaterial} attach="material" />
+              </mesh>
+
+              {/* Upper Arm (Extending over the desk toward center) */}
+              <group rotation={[0.25, -0.35, -0.25]}>
+                <mesh position={[0, 0.15, 0]} castShadow>
+                  <cylinderGeometry args={[0.0045, 0.0045, 0.30, 16]} />
+                  <primitive object={lampBodyMaterial} attach="material" />
+                </mesh>
+
+                {/* Downward Angled Designer Task Lamp Head (Firmly attached, downward cone shade, no floating pieces) */}
+                <group position={[0, 0.30, 0]} rotation={[-0.60, 0.35, 0.40]}>
+                  {/* Brass Pivot Ball Knuckle */}
+                  <mesh position={[0, 0, 0]} castShadow>
+                    <sphereGeometry args={[0.012, 16, 16]} />
+                    <primitive object={lampBrassAccentMaterial} attach="material" />
+                  </mesh>
+
+                  {/* Brass Neck Coupler */}
+                  <mesh position={[0, -0.012, 0]} castShadow>
+                    <cylinderGeometry args={[0.009, 0.013, 0.016, 16]} />
+                    <primitive object={lampBrassAccentMaterial} attach="material" />
+                  </mesh>
+
+                  {/* Designer Cone Shade (Pointing DOWN towards the desk) */}
+                  <mesh position={[0, -0.045, 0]} castShadow>
+                    <cylinderGeometry args={[0.015, 0.058, 0.055, 24, 1, false]} />
+                    <primitive object={lampBodyMaterial} attach="material" />
+                  </mesh>
+
+                  {/* Brass Rim Lip at bottom opening */}
+                  <mesh position={[0, -0.072, 0]}>
+                    <cylinderGeometry args={[0.058, 0.060, 0.005, 24]} />
+                    <primitive object={lampBrassAccentMaterial} attach="material" />
+                  </mesh>
+
+                  {/* Warm Diffused Bulb Safely Nestled INSIDE the shade */}
+                  <mesh position={[0, -0.042, 0]}>
+                    <sphereGeometry args={[0.015, 16, 16]} />
+                    <primitive object={lampBulbMaterial} attach="material" />
+                  </mesh>
+
+                  {/* Active Warm Illumination */}
+                  {isLampOn && (
+                    <pointLight
+                      position={[0, -0.06, 0]}
+                      color="#FFE2A6"
+                      intensity={2.6}
+                      distance={2.2}
+                      decay={2}
+                      castShadow
+                      shadow-bias={-0.001}
+                    />
+                  )}
+                </group>
+              </group>
+            </group>
+          </group>
+        </group>
+
+        {/* APPLE MAC MINI (Thicker Chunky Profile, Image 3 Reference with Apple Logo) */}
+        <group position={[-0.38, 0.026, -0.20]}>
+          {/* Raised Circular Black Antenna Base underneath */}
+          <mesh position={[0, -0.024, 0]} receiveShadow>
+            <cylinderGeometry args={[0.095, 0.095, 0.008, 32]} />
+            <meshStandardMaterial color="#111213" roughness={0.8} />
+          </mesh>
+
+          {/* Chunky Unibody Aluminum Enclosure (Height: 0.050) */}
           <mesh castShadow>
-            <boxGeometry args={[0.18, 0.034, 0.18]} />
+            <boxGeometry args={[0.22, 0.048, 0.22]} />
             <primitive object={appleAluminumMaterial} attach="material" />
           </mesh>
-          {/* Top Apple Logo badge */}
-          <mesh position={[0, 0.018, 0]}>
-            <boxGeometry args={[0.04, 0.001, 0.04]} />
-            <meshStandardMaterial color="#111111" roughness={0.15} metalness={0.9} />
+
+          {/* Top Plate with Authentic Vector Glossy Apple Logo (Image 3) */}
+          <mesh position={[0, 0.0242, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.218, 0.218]} />
+            <primitive object={macMiniTopMaterial} attach="material" />
           </mesh>
-          {/* Front tiny white power LED */}
-          <mesh position={[0.07, 0, 0.091]}>
-            <sphereGeometry args={[0.002, 8, 8]} />
-            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={1.5} />
+
+          {/* Front Face: Dual Thunderbolt / USB-C Ports & Headphone Jack (Image 3) */}
+          <mesh position={[-0.045, 0.002, 0.111]}>
+            <boxGeometry args={[0.005, 0.012, 0.002]} />
+            <meshStandardMaterial color="#141517" roughness={0.3} />
+          </mesh>
+          <mesh position={[-0.026, 0.002, 0.111]}>
+            <boxGeometry args={[0.005, 0.012, 0.002]} />
+            <meshStandardMaterial color="#141517" roughness={0.3} />
+          </mesh>
+          <mesh position={[0.045, 0.002, 0.111]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.003, 0.003, 0.002, 16]} />
+            <meshStandardMaterial color="#141517" roughness={0.3} />
+          </mesh>
+          {/* Front White Power Indicator LED */}
+          <mesh position={[0.088, -0.012, 0.111]}>
+            <sphereGeometry args={[0.002, 12, 12]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={2.5} />
+          </mesh>
+
+          {/* Rear Black Braided Cables plugging into back (Image 3) */}
+          <mesh position={[-0.05, 0, -0.13]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.004, 0.004, 0.05, 12]} />
+            <meshStandardMaterial color="#111111" roughness={0.7} />
+          </mesh>
+          <mesh position={[0.03, 0, -0.13]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.0035, 0.0035, 0.05, 12]} />
+            <meshStandardMaterial color="#111111" roughness={0.7} />
           </mesh>
         </group>
 
@@ -659,27 +816,76 @@ export function ArchitecturalRoomModel({
           </mesh>
         </group>
 
-        {/* APPLE MAGIC MOUSE (Curved glass/polycarbonate top) */}
-        <group position={[0.28, 0.01, 0.13]}>
-          <mesh castShadow>
-            <boxGeometry args={[0.065, 0.018, 0.115]} />
-            <primitive object={magicMouseMaterial} attach="material" />
+        {/* ERGONOMIC WIRELESS MOUSE (Precise Reference to Image 4: Amkette / MX Master Style) */}
+        <group position={[0.29, 0.016, 0.13]}>
+          {/* 1. Main Ergonomic Body Chassis */}
+          <mesh position={[0.004, -0.002, 0]} castShadow>
+            <boxGeometry args={[0.054, 0.024, 0.114]} />
+            <meshStandardMaterial color="#1E2023" roughness={0.7} metalness={0.1} />
           </mesh>
-          <mesh position={[0, -0.008, 0]}>
-            <boxGeometry args={[0.058, 0.004, 0.105]} />
-            <primitive object={appleAluminumMaterial} attach="material" />
-          </mesh>
-        </group>
 
-        {/* CLEAR GLASS WATER CARAFE & TUMBLER (Left side of desk, Image 1) */}
-        <group position={[-0.48, 0, 0.08]}>
-          <mesh position={[0, 0.09, 0]} castShadow>
-            <cylinderGeometry args={[0.045, 0.055, 0.18, 16]} />
-            <primitive object={clearGlassMaterial} attach="material" />
+          {/* 2. Flared Left Thumb Rest Wing (Signature feature from Image 4) */}
+          <mesh position={[-0.028, -0.008, -0.006]} rotation={[0, 0, 0.15]} castShadow>
+            <boxGeometry args={[0.024, 0.012, 0.076]} />
+            <meshStandardMaterial color="#282B2E" roughness={0.65} metalness={0.08} />
           </mesh>
-          <mesh position={[0, 0.07, 0]}>
-            <cylinderGeometry args={[0.042, 0.05, 0.14, 16]} />
-            <meshPhysicalMaterial color="#EBF4FA" transmission={0.95} transparent opacity={0.5} roughness={0.05} />
+
+          {/* 3. High Arched Ergonomic Palm Rest (Slope toward rear right) */}
+          <mesh position={[0.004, 0.009, -0.018]} rotation={[0.08, -0.04, 0]} castShadow>
+            <boxGeometry args={[0.052, 0.016, 0.064]} />
+            <meshStandardMaterial color="#1C1E20" roughness={0.68} metalness={0.12} />
+          </mesh>
+
+          {/* 4. Split Left & Right Click Button Plates */}
+          <mesh position={[-0.014, 0.008, 0.034]} rotation={[-0.1, 0, 0.04]} castShadow>
+            <boxGeometry args={[0.022, 0.014, 0.048]} />
+            <meshStandardMaterial color="#232629" roughness={0.6} metalness={0.1} />
+          </mesh>
+          <mesh position={[0.014, 0.008, 0.034]} rotation={[-0.1, 0, -0.04]} castShadow>
+            <boxGeometry args={[0.022, 0.014, 0.048]} />
+            <meshStandardMaterial color="#232629" roughness={0.6} metalness={0.1} />
+          </mesh>
+
+          {/* 5. Center Channel & Knurled Metal/Rubber Scroll Wheel */}
+          <group position={[0, 0.016, 0.032]}>
+            <mesh rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.0085, 0.0085, 0.0065, 20]} />
+              <meshStandardMaterial color="#3A3D42" roughness={0.3} metalness={0.8} />
+            </mesh>
+            <mesh rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.0075, 0.0075, 0.007, 20]} />
+              <meshStandardMaterial color="#111214" roughness={0.85} />
+            </mesh>
+          </group>
+
+          {/* 6. Easy-Switch / DPI Button (Silver Button behind scroll wheel) */}
+          <mesh position={[0, 0.014, 0.014]}>
+            <boxGeometry args={[0.009, 0.006, 0.014]} />
+            <meshStandardMaterial color="#B0B5BB" roughness={0.25} metalness={0.85} />
+          </mesh>
+
+          {/* 7. Triple LED Status Dots (Bluetooth / Wireless indicators) */}
+          <mesh position={[0, 0.016, -0.002]}>
+            <sphereGeometry args={[0.0012, 8, 8]} />
+            <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={2.0} />
+          </mesh>
+          <mesh position={[0, 0.015, -0.007]}>
+            <sphereGeometry args={[0.0012, 8, 8]} />
+            <meshStandardMaterial color="#555555" />
+          </mesh>
+          <mesh position={[0, 0.014, -0.012]}>
+            <sphereGeometry args={[0.0012, 8, 8]} />
+            <meshStandardMaterial color="#555555" />
+          </mesh>
+
+          {/* 8. Dual Silver Thumb Navigation Buttons (Above thumb wing) */}
+          <mesh position={[-0.024, 0.007, 0.01]}>
+            <boxGeometry args={[0.003, 0.005, 0.016]} />
+            <meshStandardMaterial color="#C4C9CF" roughness={0.2} metalness={0.9} />
+          </mesh>
+          <mesh position={[-0.024, 0.007, -0.008]}>
+            <boxGeometry args={[0.003, 0.005, 0.016]} />
+            <meshStandardMaterial color="#C4C9CF" roughness={0.2} metalness={0.9} />
           </mesh>
         </group>
 

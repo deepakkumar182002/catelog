@@ -21,7 +21,7 @@ interface DeskSceneCanvasProps {
 export function DeskSceneCanvas({
   woodColor = "#B8864E",
   woodSpecies,
-  frameColor = "#1A1A1A",
+  frameColor = "#B4BCC6",
   drawerOpenOffset = 0,
   interactive = true,
   autoRotate = false,

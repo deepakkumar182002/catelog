@@ -188,36 +188,109 @@ export function WallShelves({ woodMaterial }: WallShelvesProps) {
         </mesh>
         <pointLight position={[0.54, -0.13, 0.05]} color="#FFD994" intensity={0.4} distance={0.9} decay={2} />
 
-        {/* Vintage Amber Glass Apothecary Bottles */}
-        <group position={[0.52, -0.28, 0.03]}>
+        {/* Architectural Hardcover Books on Lower Cubby Shelf (Replacing Amber Bottles) */}
+        <group position={[0.36, -0.292, 0.02]}>
           <mesh castShadow>
-            <cylinderGeometry args={[0.042, 0.042, 0.14, 16]} />
-            <primitive object={glassAmberMaterial} attach="material" />
+            <boxGeometry args={[0.048, 0.26, 0.165]} />
+            <meshStandardMaterial color="#1B2A3D" roughness={0.55} />
           </mesh>
-          <mesh position={[0, 0.09, 0]}>
-            <cylinderGeometry args={[0.018, 0.018, 0.04, 16]} />
-            <primitive object={glassAmberMaterial} attach="material" />
+          <mesh position={[0, 0.05, 0.083]}>
+            <planeGeometry args={[0.044, 0.015]} />
+            <primitive object={brassMaterial} attach="material" />
           </mesh>
-          {/* Label */}
-          <mesh position={[0, 0, 0.043]}>
-            <planeGeometry args={[0.05, 0.07]} />
-            <meshStandardMaterial color="#EAE2D2" roughness={0.8} />
+          <mesh position={[0, 0, -0.003]}>
+            <boxGeometry args={[0.042, 0.246, 0.158]} />
+            <meshStandardMaterial color="#FAF5EB" roughness={0.9} />
           </mesh>
         </group>
-        <group position={[0.66, -0.3, 0.03]}>
+
+        <group position={[0.415, -0.282, 0.02]}>
           <mesh castShadow>
-            <cylinderGeometry args={[0.038, 0.038, 0.11, 16]} />
-            <primitive object={glassAmberMaterial} attach="material" />
+            <boxGeometry args={[0.046, 0.28, 0.16]} />
+            <meshStandardMaterial color="#243F30" roughness={0.5} />
           </mesh>
-          <mesh position={[0, 0.07, 0]}>
-            <cylinderGeometry args={[0.016, 0.016, 0.035, 16]} />
-            <primitive object={glassAmberMaterial} attach="material" />
+          <mesh position={[0, 0.07, 0.081]}>
+            <planeGeometry args={[0.04, 0.018]} />
+            <primitive object={brassMaterial} attach="material" />
           </mesh>
-          <mesh position={[0, 0, 0.039]}>
-            <planeGeometry args={[0.045, 0.055]} />
-            <meshStandardMaterial color="#EAE2D2" roughness={0.8} />
+          <mesh position={[0, 0, -0.003]}>
+            <boxGeometry args={[0.04, 0.264, 0.154]} />
+            <meshStandardMaterial color="#F7F2E7" roughness={0.9} />
           </mesh>
         </group>
+
+        <group position={[0.468, -0.307, 0.02]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.044, 0.23, 0.155]} />
+            <meshStandardMaterial color="#5E2229" roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0, -0.003]}>
+            <boxGeometry args={[0.038, 0.218, 0.15]} />
+            <meshStandardMaterial color="#F6F0E4" roughness={0.9} />
+          </mesh>
+        </group>
+
+        <group position={[0.52, -0.297, 0.02]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.046, 0.25, 0.16]} />
+            <meshStandardMaterial color="#8D4A2B" roughness={0.65} />
+          </mesh>
+          <mesh position={[0, -0.04, 0.081]}>
+            <planeGeometry args={[0.04, 0.012]} />
+            <primitive object={brassMaterial} attach="material" />
+          </mesh>
+          <mesh position={[0, 0, -0.003]}>
+            <boxGeometry args={[0.04, 0.236, 0.154]} />
+            <meshStandardMaterial color="#FAF4EA" roughness={0.9} />
+          </mesh>
+        </group>
+
+        <group position={[0.572, -0.287, 0.02]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.042, 0.27, 0.165]} />
+            <meshStandardMaterial color="#2B2D32" roughness={0.5} />
+          </mesh>
+          <mesh position={[0, 0.06, 0.083]}>
+            <planeGeometry args={[0.038, 0.015]} />
+            <primitive object={brassMaterial} attach="material" />
+          </mesh>
+          <mesh position={[0, 0, -0.003]}>
+            <boxGeometry args={[0.036, 0.254, 0.159]} />
+            <meshStandardMaterial color="#F5EFE3" roughness={0.9} />
+          </mesh>
+        </group>
+
+        <group position={[0.622, -0.307, 0.02]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.044, 0.23, 0.15]} />
+            <meshStandardMaterial color="#DFD7CB" roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 0, -0.003]}>
+            <boxGeometry args={[0.038, 0.216, 0.145]} />
+            <meshStandardMaterial color="#FFFBF2" roughness={0.9} />
+          </mesh>
+        </group>
+
+        <group position={[0.696, -0.305, 0.02]} rotation={[0, 0, -0.22]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.045, 0.24, 0.155]} />
+            <meshStandardMaterial color="#6E4324" roughness={0.55} />
+          </mesh>
+          <mesh position={[0, 0.04, 0.078]}>
+            <planeGeometry args={[0.04, 0.014]} />
+            <primitive object={brassMaterial} attach="material" />
+          </mesh>
+          <mesh position={[0, 0, -0.003]}>
+            <boxGeometry args={[0.039, 0.225, 0.15]} />
+            <meshStandardMaterial color="#F9F4EB" roughness={0.9} />
+          </mesh>
+        </group>
+
+        <mesh position={[0.78, -0.375, 0.02]} rotation={[0.4, 0.6, 0.2]} castShadow>
+          <dodecahedronGeometry args={[0.045]} />
+          <primitive object={brassMaterial} attach="material" />
+        </mesh>
+
 
         {/* BOTTOM EXTENSION LEDGE */}
         <mesh position={[-0.12, -0.58, 0]} castShadow>
