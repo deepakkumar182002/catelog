@@ -29,7 +29,7 @@ const MaterialSchema = new Schema<IMaterial>(
     },
     image: {
       type: String,
-      required: true,
+      default: "",
     },
     isAvailable: {
       type: Boolean,
@@ -42,6 +42,10 @@ const MaterialSchema = new Schema<IMaterial>(
   },
   { timestamps: true }
 );
+
+if (mongoose.models.Material) {
+  delete (mongoose.models as any).Material;
+}
 
 export const Material: Model<IMaterial> =
   mongoose.models.Material || mongoose.model<IMaterial>("Material", MaterialSchema);

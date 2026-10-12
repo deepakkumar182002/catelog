@@ -290,11 +290,11 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
         </div>
 
         {/* ========================================================= */}
-        {/* STAGE 1 HERO EDITORIAL HEADLINE (Left showroom layout)    */}
+        {/* STAGE 1 HERO EDITORIAL HEADLINE (Hidden on mobile screens) */}
         {/* ========================================================= */}
         {heroOverlayOpacity > 0.04 && (
           <div
-            className="relative z-10 max-w-xl w-full pointer-events-none transition-opacity duration-300 my-auto ml-2 sm:ml-4"
+            className="hidden sm:block relative z-10 max-w-xl w-full pointer-events-none transition-opacity duration-300 my-auto ml-2 sm:ml-4"
             style={{ opacity: heroOverlayOpacity }}
           >
             <div className="text-left flex flex-col items-start p-6 sm:p-8">
@@ -348,35 +348,42 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
         {/* BOTTOM HUD / DYNAMIC STAGE CONTROLS & INSPECTOR           */}
         {/* ========================================================= */}
         {/* ========================================================= */}
-        {/* FIXED BOTTOM-LEFT: SCROLL PROGRESS HUD (SOLID WHITE)      */}
+        {/* CANVAS-BOUND HUD: ONLY VISIBLE WITHIN 3D HERO SECTION     */}
         {/* ========================================================= */}
-        <div className="fixed bottom-8 sm:bottom-10 left-4 sm:left-8 z-40 pointer-events-auto flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-full border border-stone-200/90 shadow-xl select-none">
-          <span className="text-[9px] font-mono uppercase tracking-wider text-stone-700 font-semibold">
-            Room Visit
+        {/* 1. BOTTOM-LEFT: SCROLL PROGRESS HUD (Canvas-anchored, mobile friendly) */}
+        <div
+          className={`absolute bottom-4 sm:bottom-7 left-3 sm:left-8 z-30 pointer-events-auto flex items-center gap-2 sm:gap-2.5 bg-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-stone-200/90 shadow-xl select-none transition-opacity duration-300 ${
+            scrollProgress >= 0.98 ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          <span className="text-[8px] sm:text-[9px] font-mono uppercase tracking-wider text-stone-700 font-semibold">
+            <span className="hidden xs:inline">Room </span>Visit
           </span>
-          <div className="w-20 sm:w-24 h-1.5 bg-stone-100 rounded-full overflow-hidden border border-stone-200">
+          <div className="w-16 sm:w-24 h-1.5 bg-stone-100 rounded-full overflow-hidden border border-stone-200">
             <div
               className="h-full bg-stone-900 rounded-full transition-all duration-150"
               style={{ width: `${Math.round(scrollProgress * 100)}%` }}
             />
           </div>
-          <span className="text-[9px] font-mono text-stone-900 font-bold min-w-[24px]">
+          <span className="text-[8px] sm:text-[9px] font-mono text-stone-900 font-bold min-w-[20px] sm:min-w-[24px]">
             {Math.round(scrollProgress * 100)}%
           </span>
         </div>
 
-        {/* ========================================================= */}
-        {/* FIXED BOTTOM-RIGHT: CONTROLS DOCK (SOLID WHITE)           */}
-        {/* ========================================================= */}
-        <div className="fixed bottom-8 sm:bottom-10 right-4 sm:right-8 z-40 max-w-[340px] sm:max-w-[355px] w-[calc(100vw-2rem)] flex flex-col items-end pointer-events-none">
-          {/* EXPANDABLE DROP-UP PANEL (Expands smoothly UPWARDS, SOLID WHITE) */}
+        {/* 2. BOTTOM-RIGHT: CONTROLS DOCK (Canvas-anchored, mobile friendly) */}
+        <div
+          className={`absolute bottom-4 sm:bottom-7 right-3 sm:right-8 z-30 max-w-[320px] sm:max-w-[355px] w-[calc(100vw-1.5rem)] flex flex-col items-end pointer-events-none transition-opacity duration-300 ${
+            scrollProgress >= 0.98 ? "opacity-0 pointer-events-none" : "opacity-100"
+          }`}
+        >
+          {/* EXPANDABLE DROP-UP PANEL (Expands smoothly UPWARDS on canvas) */}
           {isControlsOpen && (
-            <div className="pointer-events-auto w-full mb-2 p-3 sm:p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-2xl transition-all duration-300 ease-out origin-bottom animate-in fade-in slide-in-from-bottom-3">
+            <div className="pointer-events-auto w-full mb-2 p-3 sm:p-3.5 rounded-2xl bg-white border border-stone-200/90 shadow-2xl transition-all duration-300 ease-out origin-bottom animate-in fade-in slide-in-from-bottom-3 max-h-[75vh] overflow-y-auto">
               {/* Compact Top Header with Close Toggle */}
               <div className="flex items-center justify-between pb-2 border-b border-stone-100">
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[9px] font-mono uppercase text-amber-900 tracking-wider font-bold">
+                  <span className="text-[8px] sm:text-[9px] font-mono uppercase text-amber-900 tracking-wider font-bold">
                     {scrollProgress < 0.32
                       ? "Phase 01 / Spatial Sanctuary"
                       : scrollProgress < 0.68
@@ -387,7 +394,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                 <button
                   type="button"
                   onClick={() => setIsControlsOpen(false)}
-                  className="cursor-pointer flex items-center gap-1 text-[10px] font-mono text-stone-600 hover:text-stone-950 bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full border border-stone-200 transition-colors"
+                  className="cursor-pointer flex items-center gap-1 text-[9px] sm:text-[10px] font-mono text-stone-600 hover:text-stone-950 bg-stone-100 hover:bg-stone-200 px-2 py-0.5 rounded-full border border-stone-200 transition-colors"
                   title="Collapse Controls"
                 >
                   <span>Drop Down</span>
@@ -402,7 +409,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                     <h3 className="text-xs font-semibold text-stone-900 leading-snug">
                       The Architect & Engineer Study
                     </h3>
-                    <p className="text-[11px] text-stone-600 mt-0.5 leading-snug">
+                    <p className="text-[10px] sm:text-[11px] text-stone-600 mt-0.5 leading-snug">
                       Scandinavian ash-oak flooring, executive workstation with ergonomic seating & floating shelving.
                     </p>
                   </div>
@@ -413,8 +420,8 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                     <h3 className="text-xs font-semibold text-stone-900 leading-snug">
                       Apple Studio Display, Mac Mini & Steaming Coffee
                     </h3>
-                    <p className="text-[11px] text-stone-600 mt-0.5 leading-snug">
-                      Apple Studio Display, unibody Mac mini, Magic Keyboard, Magic Mouse, and steaming coffee.
+                    <p className="text-[10px] sm:text-[11px] text-stone-600 mt-0.5 leading-snug">
+                      Apple Studio Display, unibody Mac mini, Magic Keyboard, Amkette ergonomic mouse, and steaming coffee.
                     </p>
                   </div>
                 )}
@@ -424,7 +431,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                     <h3 className="text-xs font-semibold text-stone-900 leading-snug">
                       Pedestal Risers & Architectural Workstation
                     </h3>
-                    <p className="text-[11px] text-stone-600 mt-0.5 leading-snug">
+                    <p className="text-[10px] sm:text-[11px] text-stone-600 mt-0.5 leading-snug">
                       Metallic riser pegs, 3-drawer storage pedestal with telescopic runners, and solid hardwood.
                     </p>
                   </div>
@@ -435,7 +442,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
               <div className="pt-2 border-t border-stone-100 flex flex-col gap-2">
                 {/* Control 1: Wood Species Switcher */}
                 <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between text-[9px] font-mono">
+                  <div className="flex items-center justify-between text-[8px] sm:text-[9px] font-mono">
                     <span className="text-stone-500 uppercase tracking-tight">Tabletop Hardwood</span>
                     <span className="font-semibold text-stone-800 bg-stone-100 px-1.5 py-0.2 rounded-full border border-stone-200">
                       {currentWoodDef.name}
@@ -450,7 +457,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                           type="button"
                           title={`${w.name} - ${w.subtitle}`}
                           onClick={() => setSelectedWood(w.id)}
-                          className={`cursor-pointer flex items-center justify-center gap-1 py-1 px-1 rounded-md text-[9px] font-mono transition-all ${
+                          className={`cursor-pointer flex items-center justify-center gap-1 py-1 px-1 rounded-md text-[8px] sm:text-[9px] font-mono transition-all ${
                             isSelected
                               ? "bg-white shadow-xs text-stone-950 font-bold ring-1 ring-stone-900/15"
                               : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
@@ -469,7 +476,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
 
                 {/* Control 2: Table Frame Metal Switcher (Default Silver) */}
                 <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between text-[9px] font-mono">
+                  <div className="flex items-center justify-between text-[8px] sm:text-[9px] font-mono">
                     <span className="text-stone-500 uppercase tracking-tight">Table Metal Frame</span>
                     <span className="font-semibold text-stone-800 bg-stone-100 px-1.5 py-0.2 rounded-full border border-stone-200">
                       {TABLE_FRAME_CONFIG[tableFrameColor]?.name}
@@ -485,7 +492,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                           type="button"
                           title={`Frame Finish: ${cfg.name}`}
                           onClick={() => setTableFrameColor(fColor)}
-                          className={`cursor-pointer flex items-center justify-center gap-1 py-1 px-1 rounded-md text-[9px] font-mono transition-all ${
+                          className={`cursor-pointer flex items-center justify-center gap-1 py-1 px-1 rounded-md text-[8px] sm:text-[9px] font-mono transition-all ${
                             isSelected
                               ? "bg-white shadow-xs text-stone-950 font-bold ring-1 ring-stone-900/15"
                               : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
@@ -508,7 +515,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                   <button
                     type="button"
                     onClick={() => setScreenMode(screenMode === "clock" ? "code" : "clock")}
-                    className="cursor-pointer text-[9px] font-mono uppercase text-stone-700 bg-stone-100 hover:bg-stone-200/80 p-1.5 rounded-lg transition-all flex flex-col items-center justify-center gap-0.5 border border-stone-200"
+                    className="cursor-pointer text-[8px] sm:text-[9px] font-mono uppercase text-stone-700 bg-stone-100 hover:bg-stone-200/80 p-1.5 rounded-lg transition-all flex flex-col items-center justify-center gap-0.5 border border-stone-200"
                     title="Toggle Screen Display (Clock / Code)"
                   >
                     <Monitor className="w-3 h-3 text-stone-700" />
@@ -519,7 +526,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                   <button
                     type="button"
                     onClick={() => setIsLampOn(!isLampOn)}
-                    className={`cursor-pointer text-[9px] font-mono uppercase p-1.5 rounded-lg transition-all flex flex-col items-center justify-center gap-0.5 border ${
+                    className={`cursor-pointer text-[8px] sm:text-[9px] font-mono uppercase p-1.5 rounded-lg transition-all flex flex-col items-center justify-center gap-0.5 border ${
                       isLampOn
                         ? "bg-amber-100/90 text-amber-950 border-amber-300 shadow-xs font-semibold"
                         : "bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200/80"
@@ -534,7 +541,7 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
                   <button
                     type="button"
                     onClick={() => setManualDrawerOverride(isDrawerOpen ? false : true)}
-                    className={`cursor-pointer text-[9px] font-mono uppercase p-1.5 rounded-lg transition-all duration-200 flex flex-col items-center justify-center gap-0.5 border ${
+                    className={`cursor-pointer text-[8px] sm:text-[9px] font-mono uppercase p-1.5 rounded-lg transition-all duration-200 flex flex-col items-center justify-center gap-0.5 border ${
                       isDrawerOpen
                         ? "bg-stone-900 text-white border-stone-900 shadow-xs"
                         : "bg-stone-100 hover:bg-stone-200/80 text-stone-800 border-stone-200"
@@ -553,42 +560,42 @@ export function Hero3DRoomExperience({ content }: Hero3DRoomExperienceProps) {
             </div>
           )}
 
-          {/* FIXED BOTTOM TRIGGER BUTTON (SOLID WHITE, never moves!) */}
+          {/* FIXED BOTTOM TRIGGER BUTTON (Canvas anchored, Solid White) */}
           <button
             type="button"
             onClick={() => setIsControlsOpen(!isControlsOpen)}
-            className="pointer-events-auto w-full cursor-pointer flex items-center justify-between gap-3 bg-white hover:bg-stone-50 p-2.5 px-3.5 rounded-2xl border border-stone-200/90 shadow-xl hover:shadow-2xl transition-all duration-200 select-none hover:-translate-y-0.5 active:translate-y-0"
+            className="pointer-events-auto w-full cursor-pointer flex items-center justify-between gap-2.5 sm:gap-3 bg-white hover:bg-stone-50 p-2 sm:p-2.5 px-3 sm:px-3.5 rounded-2xl border border-stone-200/90 shadow-xl hover:shadow-2xl transition-all duration-200 select-none hover:-translate-y-0.5 active:translate-y-0"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-stone-900 text-amber-400 flex items-center justify-center shadow-xs">
-                <SlidersHorizontal className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <div className="w-6 sm:w-7 h-6 sm:h-7 rounded-lg bg-stone-900 text-amber-400 flex items-center justify-center shadow-xs">
+                <SlidersHorizontal className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
               </div>
               <div className="flex flex-col text-left">
-                <span className="text-[9px] font-mono uppercase tracking-wider font-bold text-amber-900 leading-tight">
+                <span className="text-[8px] sm:text-[9px] font-mono uppercase tracking-wider font-bold text-amber-900 leading-tight">
                   {scrollProgress < 0.32
-                    ? "Phase 01 / Spatial Sanctuary"
+                    ? "Phase 01"
                     : scrollProgress < 0.68
-                    ? "Phase 02 / Tech Architecture"
-                    : "Phase 03 / Storage & Hardware"}
+                    ? "Phase 02"
+                    : "Phase 03"}
                 </span>
-                <span className="text-[11px] font-semibold text-stone-900 leading-tight">
+                <span className="text-[10px] sm:text-[11px] font-semibold text-stone-900 leading-tight">
                   {isControlsOpen ? "Hide Controls" : "Studio Controls"}
                 </span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pl-2.5 border-l border-stone-200">
+            <div className="flex items-center gap-1.5 sm:gap-2 pl-2 border-l border-stone-200">
               <span
-                className="w-3.5 h-3.5 rounded-full border border-stone-300 shadow-2xs"
+                className="w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full border border-stone-300 shadow-2xs"
                 style={{ backgroundColor: currentWoodDef.color }}
                 title={`Wood: ${currentWoodDef.name}`}
               />
               <span
-                className="w-3.5 h-3.5 rounded-full border border-stone-300 shadow-2xs"
+                className="w-3 sm:w-3.5 h-3 sm:h-3.5 rounded-full border border-stone-300 shadow-2xs"
                 style={{ backgroundColor: TABLE_FRAME_CONFIG[tableFrameColor]?.swatch }}
                 title={`Frame: ${TABLE_FRAME_CONFIG[tableFrameColor]?.name}`}
               />
-              <div className="w-5 h-5 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center transition-transform duration-200">
+              <div className="w-4.5 sm:w-5 h-4.5 sm:h-5 rounded-full bg-stone-100 text-stone-700 flex items-center justify-center transition-transform duration-200">
                 {isControlsOpen ? (
                   <ChevronDown className="w-3 h-3" />
                 ) : (

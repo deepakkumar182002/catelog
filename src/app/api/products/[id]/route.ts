@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/models/Product";
-import { getSessionAdmin } from "@/lib/auth";
+import { getSessionAdmin, getAdminFromRequest } from "@/lib/auth";
 import { initialProducts } from "@/lib/seedData";
 
 export const dynamic = "force-dynamic";
@@ -48,7 +48,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = await getSessionAdmin();
+    let admin = getAdminFromRequest(req);
+    if (!admin) {
+      admin = await getSessionAdmin();
+    }
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
     }
@@ -90,11 +93,14 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = await getSessionAdmin();
+    let admin = getAdminFromRequest(req);
+    if (!admin) {
+      admin = await getSessionAdmin();
+    }
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
     }

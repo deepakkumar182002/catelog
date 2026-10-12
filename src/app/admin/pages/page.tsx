@@ -63,14 +63,15 @@ export default function AdminPagesContentPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(content),
       });
+      const data = await res.json();
       if (res.ok) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3500);
       } else {
-        alert("Failed to save changes.");
+        alert(data.error || "Failed to save changes.");
       }
-    } catch {
-      alert("Failed to save page content.");
+    } catch (err: any) {
+      alert(err.message || "Failed to save page content.");
     } finally {
       setSaving(false);
     }

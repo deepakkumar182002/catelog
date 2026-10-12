@@ -46,18 +46,20 @@ export default function AdminGalleryPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newItem),
       });
-      if (res.ok) {
-        setNewItem({
-          title: "",
-          category: "Office Desks",
-          modelNumber: "EL-D01",
-          image: "",
-          featured: true,
-        });
-        fetchGallery();
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to add photo.");
       }
-    } catch {
-      alert("Failed to add photo.");
+      setNewItem({
+        title: "",
+        category: "Office Desks",
+        modelNumber: "EL-D01",
+        image: "",
+        featured: true,
+      });
+      fetchGallery();
+    } catch (err: any) {
+      alert(err.message || "Failed to add photo.");
     } finally {
       setIsAdding(false);
     }
@@ -75,19 +77,21 @@ export default function AdminGalleryPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(editingItem),
         });
-        if (res.ok) {
-          setGallery((prev) =>
-            prev.map((g) => (g._id === id ? { ...g, ...editingItem } : g))
-          );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to update photo.");
         }
+        setGallery((prev) =>
+          prev.map((g) => (g._id === id ? { ...g, ...editingItem } : g))
+        );
       } else {
         setGallery((prev) =>
           prev.map((g) => (g.title === editingItem.title ? { ...g, ...editingItem } : g))
         );
       }
       setEditingItem(null);
-    } catch {
-      alert("Failed to update photo.");
+    } catch (err: any) {
+      alert(err.message || "Failed to update photo.");
     } finally {
       setIsSaving(false);
     }

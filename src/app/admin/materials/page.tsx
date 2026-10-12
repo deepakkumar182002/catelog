@@ -47,19 +47,21 @@ export default function AdminMaterialsPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newMaterial),
       });
-      if (res.ok) {
-        setNewMaterial({
-          name: "",
-          type: "wood",
-          tone: "#C49A6C",
-          description: "",
-          image: "",
-          isAvailable: true,
-        });
-        fetchMaterials();
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to add material.");
       }
-    } catch {
-      alert("Failed to add material.");
+      setNewMaterial({
+        name: "",
+        type: "wood",
+        tone: "#C49A6C",
+        description: "",
+        image: "",
+        isAvailable: true,
+      });
+      fetchMaterials();
+    } catch (err: any) {
+      alert(err.message || "Failed to add material.");
     } finally {
       setIsAdding(false);
     }
@@ -77,11 +79,13 @@ export default function AdminMaterialsPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(editingMaterial),
         });
-        if (res.ok) {
-          setMaterials((prev) =>
-            prev.map((m) => (m._id === id ? { ...m, ...editingMaterial } : m))
-          );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to update material.");
         }
+        setMaterials((prev) =>
+          prev.map((m) => (m._id === id ? { ...m, ...editingMaterial } : m))
+        );
       } else {
         // Local state update
         setMaterials((prev) =>
@@ -89,8 +93,8 @@ export default function AdminMaterialsPage() {
         );
       }
       setEditingMaterial(null);
-    } catch {
-      alert("Failed to update material.");
+    } catch (err: any) {
+      alert(err.message || "Failed to update material.");
     } finally {
       setIsSaving(false);
     }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Gallery } from "@/models/Gallery";
-import { getSessionAdmin } from "@/lib/auth";
+import { getSessionAdmin, getAdminFromRequest } from "@/lib/auth";
 import { initialGallery } from "@/lib/seedData";
 
 export const dynamic = "force-dynamic";
@@ -16,21 +16,21 @@ export async function GET(req: NextRequest) {
     if (!db) {
       let items = [...initialGallery];
       if (category && category !== "ALL") {
-        items = items.filter((g) => g.category.toUpperCase() === category.toUpperCase());
+        items = items.filter((g) => g.category?.toLowerCase() === category.toLowerCase());
       }
       return NextResponse.json({ success: true, gallery: items });
     }
 
     const query: Record<string, any> = {};
     if (category && category !== "ALL") {
-      query.category = category.toUpperCase();
+      query.category = new RegExp(`^${category}$`, "i");
     }
 
     const gallery = await Gallery.find(query).sort({ sortOrder: 1, createdAt: -1 });
     if (!gallery || gallery.length === 0) {
       let items = [...initialGallery];
       if (category && category !== "ALL") {
-        items = items.filter((g) => g.category.toUpperCase() === category.toUpperCase());
+        items = items.filter((g) => g.category?.toLowerCase() === category.toLowerCase());
       }
       return NextResponse.json({ success: true, gallery: items });
     }
@@ -44,22 +44,37 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = await getSessionAdmin();
-    if (!admin) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    let admin = getAdminFromRequest(req);
+    if (!admin) {
+      admin = await getSessionAdmin();
+    }
+    if (!admin) return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
+
     const db = await connectDB();
     if (!db) return NextResponse.json({ error: "Database not connected." }, { status: 503 });
 
     const body = await req.json();
-    const created = await Gallery.create(body);
+    if (!body.title) {
+      return NextResponse.json({ error: "Title is required for gallery image." }, { status: 400 });
+    }
+
+    const payload = {
+      ...body,
+      isFeatured: body.isFeatured ?? body.featured ?? true,
+    };
+
+    const created = await Gallery.create(payload);
 
     try {
       revalidatePath("/");
+      revalidatePath("/gallery");
     } catch (e) {
       console.warn("Revalidate error:", e);
     }
 
     return NextResponse.json({ success: true, galleryItem: created }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Gallery POST error:", error);
+    return NextResponse.json({ error: error.message || "Failed to create gallery item." }, { status: 500 });
   }
 }

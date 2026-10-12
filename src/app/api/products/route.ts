@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Product } from "@/models/Product";
-import { getSessionAdmin } from "@/lib/auth";
+import { getSessionAdmin, getAdminFromRequest } from "@/lib/auth";
 import { autoSeedDatabase } from "@/lib/seed";
 import { initialProducts } from "@/lib/seedData";
 
@@ -61,7 +61,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = await getSessionAdmin();
+    let admin = getAdminFromRequest(req);
+    if (!admin) {
+      admin = await getSessionAdmin();
+    }
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
     }
@@ -76,12 +79,14 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    if (!body.name || !body.modelNumber || !body.heroImage) {
+    if (!body.name || !body.modelNumber) {
       return NextResponse.json(
-        { error: "Model number, product name and hero image are required." },
+        { error: "Model number and product name are required." },
         { status: 400 }
       );
     }
+
+    const heroImage = body.heroImage || (Array.isArray(body.images) ? body.images[0] : "") || "";
 
     // Auto-generate slug if not provided
     const slug =
@@ -90,6 +95,7 @@ export async function POST(req: NextRequest) {
 
     const newProduct = await Product.create({
       ...body,
+      heroImage,
       slug,
     });
 

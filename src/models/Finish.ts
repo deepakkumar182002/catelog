@@ -34,7 +34,7 @@ const FinishSchema = new Schema<IFinish>(
     },
     image: {
       type: String,
-      required: true,
+      default: "",
     },
     isAvailable: {
       type: Boolean,
@@ -47,6 +47,10 @@ const FinishSchema = new Schema<IFinish>(
   },
   { timestamps: true }
 );
+
+if (mongoose.models.Finish) {
+  delete (mongoose.models as any).Finish;
+}
 
 export const Finish: Model<IFinish> =
   mongoose.models.Finish || mongoose.model<IFinish>("Finish", FinishSchema);

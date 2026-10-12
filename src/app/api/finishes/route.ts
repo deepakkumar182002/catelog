@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Finish } from "@/models/Finish";
-import { getSessionAdmin } from "@/lib/auth";
+import { getSessionAdmin, getAdminFromRequest } from "@/lib/auth";
 import { initialFinishes } from "@/lib/seedData";
 
 export const dynamic = "force-dynamic";
@@ -26,8 +26,11 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = await getSessionAdmin();
-    if (!admin) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    let admin = getAdminFromRequest(req);
+    if (!admin) {
+      admin = await getSessionAdmin();
+    }
+    if (!admin) return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
     const db = await connectDB();
     if (!db) return NextResponse.json({ error: "Database not connected." }, { status: 503 });
 

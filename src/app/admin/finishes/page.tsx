@@ -47,19 +47,21 @@ export default function AdminFinishesPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newFinish),
       });
-      if (res.ok) {
-        setNewFinish({
-          name: "",
-          code: "",
-          ralCode: "",
-          description: "",
-          image: "",
-          isAvailable: true,
-        });
-        fetchFinishes();
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to add finish.");
       }
-    } catch {
-      alert("Failed to add finish.");
+      setNewFinish({
+        name: "",
+        code: "",
+        ralCode: "",
+        description: "",
+        image: "",
+        isAvailable: true,
+      });
+      fetchFinishes();
+    } catch (err: any) {
+      alert(err.message || "Failed to add finish.");
     } finally {
       setIsAdding(false);
     }
@@ -77,19 +79,21 @@ export default function AdminFinishesPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(editingFinish),
         });
-        if (res.ok) {
-          setFinishes((prev) =>
-            prev.map((f) => (f._id === id ? { ...f, ...editingFinish } : f))
-          );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to update finish.");
         }
+        setFinishes((prev) =>
+          prev.map((f) => (f._id === id ? { ...f, ...editingFinish } : f))
+        );
       } else {
         setFinishes((prev) =>
           prev.map((f) => (f.name === editingFinish.name ? { ...f, ...editingFinish } : f))
         );
       }
       setEditingFinish(null);
-    } catch {
-      alert("Failed to update finish.");
+    } catch (err: any) {
+      alert(err.message || "Failed to update finish.");
     } finally {
       setIsSaving(false);
     }

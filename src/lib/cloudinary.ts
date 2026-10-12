@@ -4,32 +4,51 @@ const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 const apiKey = process.env.CLOUDINARY_API_KEY;
 const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-export const isCloudinaryConfigured = Boolean(cloudName && apiKey && apiSecret);
+export function getCloudinaryClient() {
+  const cName = process.env.CLOUDINARY_CLOUD_NAME;
+  const aKey = process.env.CLOUDINARY_API_KEY;
+  const aSecret = process.env.CLOUDINARY_API_SECRET;
 
-if (isCloudinaryConfigured) {
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret,
-    secure: true,
-  });
+  if (cName && aKey && aSecret) {
+    cloudinary.config({
+      cloud_name: cName,
+      api_key: aKey,
+      api_secret: aSecret,
+      secure: true,
+    });
+    return cloudinary;
+  }
+  return null;
 }
+
+export const isCloudinaryConfigured = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+);
 
 export async function uploadToCloudinary(
   fileBuffer: Buffer,
   folder: string = "experience-life",
   filename?: string
 ): Promise<{ url: string; publicId: string }> {
-  if (!isCloudinaryConfigured) {
+  const client = getCloudinaryClient();
+  if (!client) {
     throw new Error("Cloudinary credentials are not configured in environment variables.");
   }
 
+  // Create clean, unique public_id
+  const baseName = filename
+    ? filename.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 50)
+    : "asset";
+  const uniqueId = `${Date.now()}-${baseName}`;
+
   return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
+    const uploadStream = client.uploader.upload_stream(
       {
         folder,
-        public_id: filename ? filename.replace(/\.[^/.]+$/, "") : undefined,
-        resource_type: "auto",
+        public_id: uniqueId,
+        resource_type: "image",
         transformation: [{ quality: "auto", fetch_format: "auto" }],
       },
       (error, result) => {

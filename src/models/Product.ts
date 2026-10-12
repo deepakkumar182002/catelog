@@ -71,7 +71,7 @@ const ProductSchema = new Schema<IProduct>(
     },
     heroImage: {
       type: String,
-      required: true,
+      default: "",
     },
     model3dUrl: {
       type: String,
@@ -135,6 +135,10 @@ const ProductSchema = new Schema<IProduct>(
   },
   { timestamps: true }
 );
+
+if (mongoose.models.Product) {
+  delete (mongoose.models as any).Product;
+}
 
 export const Product: Model<IProduct> =
   mongoose.models.Product || mongoose.model<IProduct>("Product", ProductSchema);

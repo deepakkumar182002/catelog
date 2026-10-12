@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSessionAdmin } from "@/lib/auth";
+import { getSessionAdmin, getAdminFromRequest } from "@/lib/auth";
 import { isCloudinaryConfigured, uploadToCloudinary } from "@/lib/cloudinary";
 import fs from "fs";
 import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
-    const admin = await getSessionAdmin();
+    // Check authentication via request cookies first, then session cookies
+    let admin = getAdminFromRequest(req);
     if (!admin) {
-      return NextResponse.json({ error: "Unauthorized access." }, { status: 401 });
+      admin = await getSessionAdmin();
+    }
+
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized access. Please login to admin portal." }, { status: 401 });
     }
 
     const formData = await req.formData();
@@ -16,45 +21,67 @@ export async function POST(req: NextRequest) {
     const folder = (formData.get("folder") as string) || "experience-life";
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided." }, { status: 400 });
+      return NextResponse.json({ error: "No file provided for upload." }, { status: 400 });
     }
 
-    // Validate mime type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/svg+xml"];
-    if (!validTypes.includes(file.type)) {
+    // Comprehensive mime types and extensions check
+    const validMimes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/pjpeg",
+      "image/png",
+      "image/x-png",
+      "image/webp",
+      "image/avif",
+      "image/svg+xml",
+      "image/gif",
+    ];
+
+    const fileNameLower = (file.name || "").toLowerCase();
+    const validExtensions = [".jpg", ".jpeg", ".png", ".webp", ".avif", ".svg", ".gif"];
+    const hasValidExtension = validExtensions.some((ext) => fileNameLower.endsWith(ext));
+    const hasValidMime = validMimes.includes(file.type.toLowerCase()) || file.type.startsWith("image/");
+
+    if (!hasValidExtension && !hasValidMime) {
       return NextResponse.json(
-        { error: "Invalid file type. Only JPG, PNG, WebP, AVIF, and SVG are supported." },
+        { error: "Invalid file type. Please upload a valid image (JPG, PNG, WebP, SVG, AVIF, GIF)." },
         { status: 400 }
       );
     }
 
-    // Limit size to 10MB
-    if (file.size > 10 * 1024 * 1024) {
+    // Limit size to 15MB
+    if (file.size > 15 * 1024 * 1024) {
       return NextResponse.json(
-        { error: "File exceeds 10MB limit." },
+        { error: "File exceeds 15MB size limit." },
         { status: 400 }
       );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
+    // 1. Try Cloudinary if configured
     if (isCloudinaryConfigured) {
-      const result = await uploadToCloudinary(buffer, folder, file.name);
-      return NextResponse.json({ success: true, url: result.url, publicId: result.publicId });
+      try {
+        const result = await uploadToCloudinary(buffer, folder, file.name);
+        return NextResponse.json({
+          success: true,
+          url: result.url,
+          publicId: result.publicId,
+          storage: "cloudinary",
+        });
+      } catch (cloudErr: any) {
+        console.warn("Cloudinary upload failed, attempting local fallback:", cloudErr?.message);
+        // If not running on Vercel, fall back to local disk storage
+        if (process.env.VERCEL) {
+          return NextResponse.json(
+            { error: `Cloudinary upload error: ${cloudErr?.message || "Failed to upload"}` },
+            { status: 500 }
+          );
+        }
+      }
     }
 
-    // In Vercel serverless environments, local disk writes are ephemeral and cannot be served
-    if (process.env.VERCEL || process.env.NODE_ENV === "production") {
-      return NextResponse.json(
-        {
-          error:
-            "Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) must be configured in Vercel Project Settings > Environment Variables for persistent uploads.",
-        },
-        { status: 500 }
-      );
-    }
-
-    // Fallback: save locally in public/uploads/ (Local development only)
+    // 2. Local disk fallback (public/uploads/)
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
     if (!fs.existsSync(uploadsDir)) {
       fs.mkdirSync(uploadsDir, { recursive: true });
@@ -72,7 +99,8 @@ export async function POST(req: NextRequest) {
       success: true,
       url: publicUrl,
       publicId: filename,
-      message: "Uploaded locally (Cloudinary credentials not set in environment).",
+      storage: "local",
+      message: "Uploaded locally.",
     });
   } catch (error: any) {
     console.error("Upload handler error:", error);

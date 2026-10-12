@@ -2,7 +2,8 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IGalleryItem extends Document {
   title: string;
-  category: "PRODUCTS" | "DETAILS" | "MATERIALS" | "LIFESTYLE" | "WORKSPACES" | "CUSTOM DESIGNS";
+  category: string;
+  modelNumber?: string;
   image: string;
   description: string;
   isFeatured: boolean;
@@ -20,13 +21,18 @@ const GallerySchema = new Schema<IGalleryItem>(
     },
     category: {
       type: String,
-      enum: ["PRODUCTS", "DETAILS", "MATERIALS", "LIFESTYLE", "WORKSPACES", "CUSTOM DESIGNS"],
-      default: "PRODUCTS",
+      default: "Office Desks",
       index: true,
+      trim: true,
+    },
+    modelNumber: {
+      type: String,
+      default: "",
+      trim: true,
     },
     image: {
       type: String,
-      required: true,
+      default: "",
     },
     description: {
       type: String,
@@ -34,7 +40,7 @@ const GallerySchema = new Schema<IGalleryItem>(
     },
     isFeatured: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     sortOrder: {
       type: Number,
@@ -43,6 +49,10 @@ const GallerySchema = new Schema<IGalleryItem>(
   },
   { timestamps: true }
 );
+
+if (mongoose.models.Gallery) {
+  delete (mongoose.models as any).Gallery;
+}
 
 export const Gallery: Model<IGalleryItem> =
   mongoose.models.Gallery || mongoose.model<IGalleryItem>("Gallery", GallerySchema);
