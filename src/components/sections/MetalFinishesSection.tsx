@@ -1,19 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
+import React, { useState, useEffect } from "react";
 import { Check } from "lucide-react";
+import { BackendImage } from "@/components/ui/BackendImage";
+
+interface FinishItem {
+  id?: number | string;
+  _id?: string;
+  name: string;
+  colorCode: string;
+  description: string;
+  image?: string;
+  tag?: string;
+}
 
 export function MetalFinishesSection() {
   const [selectedFinish, setSelectedFinish] = useState<number>(0);
-
-  const finishes = [
+  const [finishes, setFinishes] = useState<FinishItem[]>([
     {
       id: 0,
       name: "MATTE BLACK — STANDARD",
       colorCode: "#121212",
       description: "Our signature electrostatic powder coat. Deep matte texture resistant to fingerprints, everyday handling and abrasion.",
-      image: "/images/finishes/matte-black.png",
+      image: "",
       tag: "Standard Issue",
     },
     {
@@ -21,7 +30,7 @@ export function MetalFinishesSection() {
       name: "GRAPHITE GREY — MODERN",
       colorCode: "#3E4042",
       description: "Subtle industrial charcoal finish offering soft contrast against light woods, raw concrete and neutral architectural environments.",
-      image: "/images/finishes/graphite-grey.png",
+      image: "",
       tag: "Architectural",
     },
     {
@@ -29,7 +38,7 @@ export function MetalFinishesSection() {
       name: "WHITE — CLEAN & MINIMAL",
       colorCode: "#FAFAFA",
       description: "Pristine matte architectural white finish creating bright, open spaces with Scandinavian clarity.",
-      image: "/images/finishes/white.png",
+      image: "",
       tag: "Contemporary",
     },
     {
@@ -37,10 +46,38 @@ export function MetalFinishesSection() {
       name: "CUSTOM COLOUR — ON REQUEST",
       colorCode: "#7A5E4D",
       description: "Custom RAL powder coat formulations matched precisely to your interior designer palette, corporate brand colors or project specifications.",
-      image: "/images/finishes/custom-colour.png",
+      image: "",
       tag: "Bespoke RAL",
     },
-  ];
+  ]);
+
+  useEffect(() => {
+    async function loadFinishes() {
+      try {
+        const res = await fetch("/api/finishes");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.finishes && data.finishes.length > 0) {
+            const mapped = data.finishes.map((f: any, idx: number) => ({
+              id: idx,
+              _id: f._id,
+              name: f.name,
+              colorCode: f.colorHex || "#121212",
+              description: f.description || "Durable powder-coated finish with premium appearance.",
+              image: f.image?.startsWith("/images/") ? "" : f.image,
+              tag: f.type === "powder_coat" ? "Powder Coat" : "Custom RAL",
+            }));
+            setFinishes(mapped);
+          }
+        }
+      } catch (err) {
+        console.warn("Using offline finishes list");
+      }
+    }
+    loadFinishes();
+  }, []);
+
+  const currentFinish = finishes[selectedFinish] || finishes[0];
 
   return (
     <section id="finishes" className="py-28 md:py-36 px-6 md:px-12 bg-[#FAF8F5] border-b border-stone-200/80">
@@ -64,7 +101,7 @@ export function MetalFinishesSection() {
                 const isSelected = selectedFinish === idx;
                 return (
                   <div
-                    key={f.id}
+                    key={f.id ?? idx}
                     onClick={() => setSelectedFinish(idx)}
                     className={`cursor-pointer p-4 rounded-xl border transition-all duration-300 flex items-center justify-between ${
                       isSelected
@@ -107,45 +144,47 @@ export function MetalFinishesSection() {
             <div className="mt-8 p-4 bg-stone-100/70 rounded-xl border border-stone-200 text-xs font-mono text-stone-600 flex items-center justify-between">
               <span>Selected Preview:</span>
               <span className="font-bold text-stone-900">
-                {finishes[selectedFinish].name}
+                {currentFinish.name}
               </span>
             </div>
           </div>
 
-          {/* Right Column: Active Finish Visual Showcase */}
+          {/* Right Column: Visual Preview */}
           <div className="lg:col-span-6">
-            <div className="relative w-full h-[400px] sm:h-[480px] rounded-2xl bg-white border border-stone-300 shadow-xl overflow-hidden p-8 flex flex-col justify-between">
-              <div
-                className="relative w-full h-[280px] sm:h-[320px]"
-                style={{ position: "relative" }}
-              >
-                <Image
-                  src={finishes[selectedFinish].image}
-                  alt={finishes[selectedFinish].name}
-                  fill
-                  className="object-contain transition-all duration-500"
-                  sizes="(max-width: 1024px) 100vw, 600px"
-                />
-              </div>
+            <div
+              className="relative w-full h-[450px] sm:h-[500px] rounded-2xl bg-white border border-stone-200 overflow-hidden shadow-xl"
+              style={{ position: "relative" }}
+            >
+              <BackendImage
+                key={currentFinish.name}
+                src={currentFinish.image}
+                alt={currentFinish.name}
+                fill
+                objectFit="cover"
+                sizes="(max-width: 1024px) 100vw, 600px"
+                fallbackLabel={`${currentFinish.name} Texture`}
+                loadingLabel="Loading Finish Visual..."
+              />
 
-              <div className="pt-4 border-t border-stone-200 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-mono tracking-widest uppercase text-stone-500">
-                    Finish Specification
-                  </span>
-                  <p className="text-sm font-bold font-editorial text-stone-900 uppercase">
-                    {finishes[selectedFinish].name}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className="w-5 h-5 rounded-full border border-stone-300"
-                    style={{ backgroundColor: finishes[selectedFinish].colorCode }}
+              {/* Color swatch floating tag */}
+              <div className="absolute bottom-6 left-6 right-6 z-10 flex items-center justify-between bg-white/95 backdrop-blur-md p-4 rounded-xl border border-stone-200 shadow-md">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-6 h-6 rounded-md border border-stone-300 shadow-inner"
+                    style={{ backgroundColor: currentFinish.colorCode }}
                   />
-                  <span className="text-xs font-mono text-stone-600 uppercase">
-                    Electrostatic Coated
-                  </span>
+                  <div>
+                    <p className="text-xs font-bold text-stone-900 uppercase font-editorial">
+                      {currentFinish.name}
+                    </p>
+                    <span className="text-[10px] font-mono text-stone-500">
+                      Hex: {currentFinish.colorCode}
+                    </span>
+                  </div>
                 </div>
+                <span className="text-[10px] font-mono uppercase text-amber-800 font-semibold">
+                  Electrostatic Matte
+                </span>
               </div>
             </div>
           </div>

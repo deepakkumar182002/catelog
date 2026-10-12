@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, CheckCircle2, Layers, Cpu, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, RotateCcw, Eye } from "lucide-react";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 interface FeaturedProductSectionProps {
   content?: {
@@ -11,54 +11,97 @@ interface FeaturedProductSectionProps {
     featuredModel?: string;
     featuredHeading?: string;
     featuredDescription?: string;
+    featuredMainImage?: string;
+
+    featuredHotspot1Title?: string;
+    featuredHotspot1Spec?: string;
+    featuredHotspot1Desc?: string;
+    featuredHotspot1Tag?: string;
+    featuredHotspot1Image?: string;
+
+    featuredHotspot2Title?: string;
+    featuredHotspot2Spec?: string;
+    featuredHotspot2Desc?: string;
+    featuredHotspot2Tag?: string;
+    featuredHotspot2Image?: string;
+
+    featuredHotspot3Title?: string;
+    featuredHotspot3Spec?: string;
+    featuredHotspot3Desc?: string;
+    featuredHotspot3Tag?: string;
+    featuredHotspot3Image?: string;
+
+    featuredHotspot4Title?: string;
+    featuredHotspot4Spec?: string;
+    featuredHotspot4Desc?: string;
+    featuredHotspot4Tag?: string;
+    featuredHotspot4Image?: string;
   };
 }
 
 export function FeaturedProductSection({ content }: FeaturedProductSectionProps) {
-  const [activeHotspot, setActiveHotspot] = useState<number>(0);
+  // activeHotspot: null means showing the Main Desk full view, 0..3 means showing that specific component
+  const [activeHotspot, setActiveHotspot] = useState<number | null>(0);
 
   const tagline = content?.featuredTagline || "Catalogue Focus";
   const model = content?.featuredModel || "MODEL EL-D01";
   const heading = content?.featuredHeading || "EXECUTIVE WORK DESK";
+  const mainImage = content?.featuredMainImage || "";
 
   const hotspots = [
     {
       id: 0,
-      title: "TABLE TOP",
-      spec: "Natural Wood Finish • 18–25 mm Thickness",
+      title: content?.featuredHotspot1Title || "TABLE TOP",
+      spec: content?.featuredHotspot1Spec || "Natural Wood Finish • 18–25 mm Thickness",
       description:
+        content?.featuredHotspot1Desc ||
         "Kiln-dried hardwood and natural veneer tops with bevelled edges. Treated with commercial-grade scratch-resistant matte clear coat that preserves natural wood grain warmth.",
-      image: "/images/details/tabletop-detail.png",
-      tag: "Surfaces",
+      image: content?.featuredHotspot1Image || "",
+      tag: content?.featuredHotspot1Tag || "Surfaces",
     },
     {
       id: 1,
-      title: "DRAWER SYSTEM",
-      spec: "Four Smooth Drawers • Full-Extension Channels",
+      title: content?.featuredHotspot2Title || "DRAWER SYSTEM",
+      spec: content?.featuredHotspot2Spec || "Four Smooth Drawers • Full-Extension Channels",
       description:
+        content?.featuredHotspot2Desc ||
         "Precision telescopic channels allow 100% full-extension access. Constructed with 12mm plywood drawer boxes and integrated flush profile metal handles.",
-      image: "/images/details/drawer-detail.png",
-      tag: "Storage",
+      image: content?.featuredHotspot2Image || "",
+      tag: content?.featuredHotspot2Tag || "Storage",
     },
     {
       id: 2,
-      title: "METAL FRAME",
-      spec: "Strong MS Square-Pipe • Matte Black Coating",
+      title: content?.featuredHotspot3Title || "METAL FRAME",
+      spec: content?.featuredHotspot3Spec || "Strong MS Square-Pipe • Matte Black Coating",
       description:
+        content?.featuredHotspot3Desc ||
         "High-tensile Mild Steel square-tube perimeter framework. Finished in electrostatic matte black powder coat for corrosion resistance and architectural minimalism.",
-      image: "/images/details/metalframe-detail.png",
-      tag: "Structure",
+      image: content?.featuredHotspot3Image || "",
+      tag: content?.featuredHotspot3Tag || "Structure",
     },
     {
       id: 3,
-      title: "X SUPPORT",
-      spec: "Metal Cross-Support • Zero Lateral Deflection",
+      title: content?.featuredHotspot4Title || "X SUPPORT",
+      spec: content?.featuredHotspot4Spec || "Metal Cross-Support • Zero Lateral Deflection",
       description:
+        content?.featuredHotspot4Desc ||
         "Signature industrial X-brace provides structural triangulated reinforcement. Ensures total rock-solid stability even under heavy dual-monitor executive setups.",
-      image: "/images/details/xsupport-detail.png",
-      tag: "Stability",
+      image: content?.featuredHotspot4Image || "",
+      tag: content?.featuredHotspot4Tag || "Stability",
     },
   ];
+
+  // Determine which image to show in the Left Main Stage
+  const selectedComponent = activeHotspot !== null ? hotspots[activeHotspot] : null;
+  // If a hotspot is clicked and has an image, show that; if hotspot has no image, fallback to mainImage, otherwise empty string (BackendImage handles loader/placeholder)
+  const activeLeftImage =
+    selectedComponent && selectedComponent.image
+      ? selectedComponent.image
+      : mainImage;
+
+  const activeLeftLabel = selectedComponent
+    ? `Component 0${selectedComponent.id + 1}: ${selectedComponent.title}`
+    : "Full View Executive Work Desk";
 
   return (
     <section id="featured" className="py-28 md:py-36 px-6 md:px-12 bg-[#FAF8F5] border-b border-stone-200/80">
@@ -93,37 +136,75 @@ export function FeaturedProductSection({ content }: FeaturedProductSectionProps)
 
         {/* Master Showcase Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-12 items-start">
-          {/* Left Column: Product Photo & Dimensions Summary */}
+          {/* Left Column: Primary Interactive Showcase Viewer (Dynamically switches on right clicks) */}
           <div className="lg:col-span-7 flex flex-col gap-6">
             <div
               className="relative w-full h-[400px] sm:h-[480px] md:h-[540px] rounded-2xl bg-white border border-stone-200/90 shadow-lg overflow-hidden group"
               style={{ position: "relative" }}
             >
-              <Image
-                src="/images/products/executive-work-desk.png"
-                alt="Executive Work Desk Full View"
+              {/* Dynamic Image in Left Stage */}
+              <BackendImage
+                key={activeLeftImage || "featured-main"}
+                src={activeLeftImage}
+                alt={activeLeftLabel}
                 fill
                 priority
-                className="object-contain p-6 md:p-10 group-hover:scale-102 transition-transform duration-700 ease-out"
+                objectFit="contain"
+                className="p-6 md:p-10 group-hover:scale-102 transition-transform duration-700 ease-out"
                 sizes="(max-width: 1024px) 100vw, 700px"
+                fallbackLabel={`${activeLeftLabel} — Upload in Admin`}
+                loadingLabel="Loading Inspection Image..."
               />
 
-              {/* Badges */}
-              <div className="absolute top-6 left-6 flex flex-col gap-2">
+              {/* Badges / Active Component Indicator */}
+              <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
                 <span className="bg-stone-900 text-[#FAF8F5] text-[10px] font-mono uppercase px-3 py-1 rounded-full tracking-wider shadow">
                   Executive Series
                 </span>
-                <span className="bg-stone-100/90 backdrop-blur-sm text-stone-800 border border-stone-300 text-[10px] font-mono uppercase px-3 py-1 rounded-full tracking-wider">
+                <span className="bg-white/90 backdrop-blur-sm text-stone-800 border border-stone-300 text-[10px] font-mono uppercase px-3 py-1 rounded-full tracking-wider">
                   Customization Available
                 </span>
+                {selectedComponent && (
+                  <span className="bg-amber-800 text-white text-[10px] font-mono uppercase px-3 py-1 rounded-full tracking-wider shadow animate-in fade-in duration-200">
+                    Inspecting: 0{selectedComponent.id + 1} {selectedComponent.title}
+                  </span>
+                )}
               </div>
+
+              {/* Switch to Full Desk View button if inspecting a component */}
+              {selectedComponent && (
+                <div className="absolute bottom-6 right-6 z-10">
+                  <button
+                    type="button"
+                    onClick={() => setActiveHotspot(null)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-stone-900/90 hover:bg-stone-900 text-white text-[10px] font-mono uppercase tracking-wider shadow-md backdrop-blur-xs transition-colors"
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    <span>View Full Desk</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Product Specifications Table */}
             <div className="bg-stone-100/80 p-6 md:p-8 rounded-2xl border border-stone-200">
-              <h3 className="text-xs font-mono uppercase tracking-widest text-stone-500 mb-4">
-                Standard Engineering Dimensions
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs font-mono uppercase tracking-widest text-stone-500">
+                  Standard Engineering Dimensions
+                </h3>
+                {activeHotspot === null ? (
+                  <span className="text-[10px] font-mono uppercase text-emerald-800 font-semibold">
+                    Full Desk Selected
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => setActiveHotspot(null)}
+                    className="text-[10px] font-mono uppercase text-amber-800 hover:underline"
+                  >
+                    Show Full Desk Model
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-3 gap-6 text-stone-900">
                 <div className="border-l-2 border-stone-900 pl-4">
                   <span className="text-[11px] font-mono text-stone-500 uppercase block">Length</span>
@@ -169,16 +250,21 @@ export function FeaturedProductSection({ content }: FeaturedProductSectionProps)
             </div>
           </div>
 
-          {/* Right Column: Interactive Hotspot Details */}
+          {/* Right Column: Interactive Hotspot Examination Points */}
           <div className="lg:col-span-5 flex flex-col">
-            <span className="text-[11px] font-mono uppercase tracking-widest text-stone-500 mb-2">
-              Component Examination
-            </span>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-mono uppercase tracking-widest text-stone-500">
+                Component Examination
+              </span>
+              <span className="text-[10px] font-mono text-amber-800 uppercase font-semibold">
+                Click any item to view on left
+              </span>
+            </div>
             <h3 className="text-2xl md:text-3xl font-editorial font-bold text-stone-900 uppercase tracking-tight">
               DESIGN DETAILS
             </h3>
             <p className="text-xs text-stone-600 font-mono mt-1 mb-6 leading-relaxed">
-              Every detail is crafted for strength, stability and a premium look. Select a component to inspect its engineering:
+              Every detail is crafted for strength, stability and a premium look. Select a numbered component to inspect its engineering and reveal its image on the left:
             </p>
 
             {/* Hotspot Accordion / Switcher */}
@@ -191,22 +277,27 @@ export function FeaturedProductSection({ content }: FeaturedProductSectionProps)
                     onClick={() => setActiveHotspot(idx)}
                     className={`cursor-pointer rounded-xl transition-all duration-300 border ${
                       isActive
-                        ? "bg-white border-stone-900 shadow-md p-5"
+                        ? "bg-white border-stone-900 shadow-md p-5 ring-1 ring-stone-900/10"
                         : "bg-stone-50/70 border-stone-200/80 hover:bg-stone-100/80 p-4"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <span
-                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold ${
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono font-bold transition-colors ${
                             isActive ? "bg-stone-900 text-white" : "bg-stone-200 text-stone-700"
                           }`}
                         >
                           0{idx + 1}
                         </span>
                         <div>
-                          <h4 className="text-sm font-bold text-stone-900 uppercase font-editorial tracking-tight">
-                            {item.title}
+                          <h4 className="text-sm font-bold text-stone-900 uppercase font-editorial tracking-tight flex items-center gap-2">
+                            <span>{item.title}</span>
+                            {isActive && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">
+                                <Eye className="w-2.5 h-2.5" /> Shown on Left
+                              </span>
+                            )}
                           </h4>
                           <span className="text-[11px] font-mono text-stone-500">
                             {item.spec}
@@ -225,18 +316,23 @@ export function FeaturedProductSection({ content }: FeaturedProductSectionProps)
                           <p className="text-xs text-stone-700 leading-relaxed font-sans">
                             {item.description}
                           </p>
+                          <span className="text-[10px] font-mono text-amber-900 mt-2 block font-semibold">
+                            &larr; Displayed in main stage on left
+                          </span>
                         </div>
                         <div className="sm:col-span-5">
                           <div
                             className="relative w-full h-24 rounded-lg overflow-hidden border border-stone-200 bg-stone-100"
                             style={{ position: "relative" }}
                           >
-                            <Image
+                            <BackendImage
                               src={item.image}
                               alt={item.title}
                               fill
-                              className="object-cover"
+                              objectFit="cover"
                               sizes="160px"
+                              fallbackLabel="Upload in Admin"
+                              loadingLabel="Loading..."
                             />
                           </div>
                         </div>

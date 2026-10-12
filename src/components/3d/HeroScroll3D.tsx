@@ -96,26 +96,15 @@ export function HeroScroll3D() {
 
         {/* 3D Canvas / Fallback Poster Container */}
         <div className="absolute inset-0 z-0 flex items-center justify-center">
-          {/* Fallback poster image for instant first-paint */}
-          <div
-            className={`absolute inset-0 flex items-center justify-center transition-opacity duration-1000 pointer-events-none ${
-              is3DReady ? "opacity-0" : "opacity-100"
-            }`}
-          >
-            <div
-              className="relative w-full max-w-2xl h-[420px]"
-              style={{ position: "relative" }}
-            >
-              <Image
-                src="/images/products/executive-work-desk.png"
-                alt="Executive Work Desk 3D Model Poster"
-                fill
-                priority
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, 800px"
-              />
+          {/* Fallback loader for 3D initialization */}
+          {!is3DReady && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-700 pointer-events-none">
+              <div className="w-12 h-12 rounded-full border-2 border-stone-300 border-t-amber-800 animate-spin mb-4" />
+              <span className="text-xs font-mono uppercase tracking-widest text-stone-500 font-medium">
+                Initializing Architectural 3D Scene...
+              </span>
             </div>
-          </div>
+          )}
 
           {/* Real Three.js Canvas */}
           {is3DReady && (

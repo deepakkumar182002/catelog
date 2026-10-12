@@ -1,11 +1,13 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowUpRight, ShieldCheck, Truck, Ruler, FileText } from "lucide-react";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 interface B2BSectionProps {
   content?: {
     b2bHeading?: string;
     b2bText?: string;
+    b2bImage?: string;
   };
 }
 
@@ -14,6 +16,8 @@ export function B2BSection({ content }: B2BSectionProps) {
   const text =
     content?.b2bText ||
     "Whether you are furnishing an office, developing an interior project, setting up a commercial space or sourcing furniture in quantity, we can discuss the right design, materials, dimensions and finish for your requirement.";
+  const b2bImage = content?.b2bImage || "";
+
   const b2bHighlights = [
     {
       icon: Ruler,
@@ -79,21 +83,37 @@ export function B2BSection({ content }: B2BSectionProps) {
             </div>
           </div>
 
-          {/* Right Column: 4 B2B Highlights */}
-          <div className="lg:col-span-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {/* Right Column: B2B Highlights + Image */}
+          <div className="lg:col-span-6 space-y-6">
+            {b2bImage && (
+              <div
+                className="relative w-full h-56 rounded-2xl overflow-hidden border border-stone-800 shadow-xl"
+                style={{ position: "relative" }}
+              >
+                <BackendImage
+                  src={b2bImage}
+                  alt="Commercial Architecture & Bulk Division"
+                  fill
+                  objectFit="cover"
+                  sizes="(max-width: 1024px) 100vw, 600px"
+                  loadingLabel="Loading Commercial Visual..."
+                />
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {b2bHighlights.map((b) => {
                 const Icon = b.icon;
                 return (
                   <div
                     key={b.title}
-                    className="p-6 rounded-2xl bg-stone-900/90 border border-stone-800 flex flex-col justify-between"
+                    className="p-5 rounded-2xl bg-stone-900/90 border border-stone-800 flex flex-col justify-between"
                   >
                     <div>
-                      <div className="w-10 h-10 rounded-lg bg-stone-800 flex items-center justify-center text-amber-400 mb-4">
-                        <Icon className="w-5 h-5 stroke-[1.5]" />
+                      <div className="w-9 h-9 rounded-lg bg-stone-800 flex items-center justify-center text-amber-400 mb-3">
+                        <Icon className="w-4 h-4 stroke-[1.5]" />
                       </div>
-                      <h3 className="text-base font-bold font-editorial text-stone-100 uppercase tracking-tight mb-2">
+                      <h3 className="text-sm font-bold font-editorial text-stone-100 uppercase tracking-tight mb-1.5">
                         {b.title}
                       </h3>
                       <p className="text-xs text-stone-400 leading-relaxed font-sans">

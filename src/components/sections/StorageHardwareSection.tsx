@@ -1,11 +1,35 @@
 import React from "react";
-import Image from "next/image";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 interface StorageHardwareSectionProps {
   content?: {
     hardwareTagline?: string;
     hardwareHeading?: string;
     hardwareSubheading?: string;
+
+    hardwareItem1Title?: string;
+    hardwareItem1Spec?: string;
+    hardwareItem1Desc?: string;
+    hardwareItem1Detail?: string;
+    hardwareItem1Image?: string;
+
+    hardwareItem2Title?: string;
+    hardwareItem2Spec?: string;
+    hardwareItem2Desc?: string;
+    hardwareItem2Detail?: string;
+    hardwareItem2Image?: string;
+
+    hardwareItem3Title?: string;
+    hardwareItem3Spec?: string;
+    hardwareItem3Desc?: string;
+    hardwareItem3Detail?: string;
+    hardwareItem3Image?: string;
+
+    hardwareItem4Title?: string;
+    hardwareItem4Spec?: string;
+    hardwareItem4Desc?: string;
+    hardwareItem4Detail?: string;
+    hardwareItem4Image?: string;
   };
 }
 
@@ -15,34 +39,43 @@ export function StorageHardwareSection({ content }: StorageHardwareSectionProps)
   const subheading =
     content?.hardwareSubheading ||
     "High-quality hardware designed for smooth and long-lasting everyday use. We never cut corners on internal mechanics, runners or joinery components.";
+
   const hardwareItems = [
     {
-      title: "FULL-EXTENSION TELESCOPIC CHANNEL",
-      spec: "16–20 INCH LENGTH",
-      description: "Heavy-gauge ball-bearing runners providing 100% full extension drawer access, smooth dampening, and high load capacity without sagging.",
-      image: "/images/hardware/telescopic-channel.png",
-      detail: "Silent steel ball-bearings",
+      title: content?.hardwareItem1Title || "FULL-EXTENSION TELESCOPIC CHANNEL",
+      spec: content?.hardwareItem1Spec || "16–20 INCH LENGTH",
+      description:
+        content?.hardwareItem1Desc ||
+        "Heavy-gauge ball-bearing runners providing 100% full extension drawer access, smooth dampening, and high load capacity without sagging.",
+      image: content?.hardwareItem1Image || "",
+      detail: content?.hardwareItem1Detail || "Silent steel ball-bearings",
     },
     {
-      title: "DRAWER BOX CONSTRUCTION",
-      spec: "12 MM SIDES • 6 MM BOTTOM",
-      description: "Engineered from calibrated structural marine-grade plywood with interlocking joints, ensuring lifetime squareness under heavy storage loads.",
-      image: "/images/hardware/drawer-box.png",
-      detail: "Calibrated Birch / Hardwood Ply",
+      title: content?.hardwareItem2Title || "DRAWER BOX CONSTRUCTION",
+      spec: content?.hardwareItem2Spec || "12 MM SIDES • 6 MM BOTTOM",
+      description:
+        content?.hardwareItem2Desc ||
+        "Engineered from calibrated structural marine-grade plywood with interlocking joints, ensuring lifetime squareness under heavy storage loads.",
+      image: content?.hardwareItem2Image || "",
+      detail: content?.hardwareItem2Detail || "Calibrated Birch / Hardwood Ply",
     },
     {
-      title: "HANDLE OPTIONS",
-      spec: "BLACK METAL / PROFILE HANDLE",
-      description: "Minimalist aluminum and steel J-profile and edge-mount handles, powder-coated in matte black to integrate seamlessly into drawer faces.",
-      image: "/images/hardware/profile-handle.png",
-      detail: "Ergonomic flush grip profile",
+      title: content?.hardwareItem3Title || "HANDLE OPTIONS",
+      spec: content?.hardwareItem3Spec || "BLACK METAL / PROFILE HANDLE",
+      description:
+        content?.hardwareItem3Desc ||
+        "Minimalist aluminum and steel J-profile and edge-mount handles, powder-coated in matte black to integrate seamlessly into drawer faces.",
+      image: content?.hardwareItem3Image || "",
+      detail: content?.hardwareItem3Detail || "Ergonomic flush grip profile",
     },
     {
-      title: "SIDE CABINET PANEL",
-      spec: "18 MM PLYWOOD • MATTE BLACK FINISH",
-      description: "Substantial 18mm plywood perimeter side casing with seamless polyurethane edge banding, safeguarding the pedestal against daily scuffs.",
-      image: "/images/hardware/side-cabinet.png",
-      detail: "Impact-resistant matte casing",
+      title: content?.hardwareItem4Title || "SIDE CABINET PANEL",
+      spec: content?.hardwareItem4Spec || "18 MM PLYWOOD • MATTE BLACK FINISH",
+      description:
+        content?.hardwareItem4Desc ||
+        "Substantial 18mm plywood perimeter side casing with seamless polyurethane edge banding, safeguarding the pedestal against daily scuffs.",
+      image: content?.hardwareItem4Image || "",
+      detail: content?.hardwareItem4Detail || "Impact-resistant matte casing",
     },
   ];
 
@@ -74,14 +107,17 @@ export function StorageHardwareSection({ content }: StorageHardwareSectionProps)
                   className="relative w-full h-52 bg-stone-100 overflow-hidden"
                   style={{ position: "relative" }}
                 >
-                  <Image
+                  <BackendImage
                     src={item.image}
                     alt={item.title}
                     fill
-                    className="object-cover group-hover:scale-103 transition-transform duration-500"
+                    objectFit="cover"
+                    className="group-hover:scale-103 transition-transform duration-500"
                     sizes="(max-width: 768px) 100vw, 550px"
+                    fallbackLabel={`${item.title} Photo — Upload in Admin`}
+                    loadingLabel="Loading hardware photo..."
                   />
-                  <div className="absolute top-4 left-4 bg-stone-900 text-white text-[10px] font-mono uppercase px-3 py-1 rounded-full">
+                  <div className="absolute top-4 left-4 z-10 bg-stone-900 text-white text-[10px] font-mono uppercase px-3 py-1 rounded-full">
                     0{idx + 1}
                   </div>
                 </div>

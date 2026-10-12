@@ -5,7 +5,10 @@ import { notFound } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { DeskSceneCanvas } from "@/components/3d/DeskSceneCanvas";
-import { initialProducts } from "@/lib/seedData";
+import { connectDB } from "@/lib/db";
+import { Product } from "@/models/Product";
+import { BackendImage } from "@/components/ui/BackendImage";
+import { initialProducts, SeedProduct } from "@/lib/seedData";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -22,7 +25,7 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
-  return initialProducts.map((p) => ({
+  return initialProducts.map((p: SeedProduct) => ({
     slug: p.slug,
   }));
 }
@@ -30,14 +33,32 @@ export async function generateStaticParams() {
 export default async function ProductDetailPage({ params }: ProductPageProps) {
   const { slug } = await params;
 
-  // Search product
-  const product = initialProducts.find((p) => p.slug === slug);
+  let product: any = null;
+  try {
+    const db = await connectDB();
+    if (db) {
+      const dbProduct = await Product.findOne({ slug });
+      if (dbProduct) {
+        product = dbProduct.toObject();
+      }
+    }
+  } catch (err) {
+    // fallback
+  }
+
+  if (!product) {
+    product = initialProducts.find((p: SeedProduct) => p.slug === slug);
+  }
 
   if (!product) {
     notFound();
   }
 
-  const relatedProducts = initialProducts.filter((p) => p.slug !== slug).slice(0, 3);
+  // Clean static /images/ path
+  const heroImage = product.heroImage?.startsWith("/images/") ? "" : product.heroImage;
+  const images = (product.images || []).map((img: string) => (img.startsWith("/images/") ? "" : img));
+
+  const relatedProducts = initialProducts.filter((p: SeedProduct) => p.slug !== slug).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-stone-900">
@@ -78,32 +99,37 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                     </div>
                   </div>
                 ) : (
-                  <Image
-                    src={product.heroImage}
+                  <BackendImage
+                    src={heroImage}
                     alt={product.name}
                     fill
                     priority
-                    className="object-contain p-8 group-hover:scale-103 transition-transform duration-700"
+                    objectFit="contain"
+                    className="p-8 group-hover:scale-103 transition-transform duration-700"
                     sizes="(max-width: 1024px) 100vw, 700px"
+                    fallbackLabel={`${product.name} — Upload in Admin`}
+                    loadingLabel="Loading Product Visual..."
                   />
                 )}
               </div>
 
               {/* Detail Gallery Thumbs */}
-              {product.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="grid grid-cols-4 gap-4">
-                  {product.images.slice(0, 4).map((img, idx) => (
+                  {images.slice(0, 4).map((img: string, idx: number) => (
                     <div
                       key={idx}
                       style={{ position: "relative" }}
                       className="relative h-24 rounded-xl bg-white border border-stone-200 overflow-hidden"
                     >
-                      <Image
+                      <BackendImage
                         src={img}
                         alt={`${product.name} thumbnail ${idx + 1}`}
                         fill
-                        className="object-cover"
+                        objectFit="cover"
                         sizes="180px"
+                        fallbackLabel="Thumbnail"
+                        loadingLabel="Loading..."
                       />
                     </div>
                   ))}
@@ -164,7 +190,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 <span className="text-xs font-mono uppercase tracking-widest text-stone-500 block mb-3">
                   Craftsmanship Highlights
                 </span>
-                {product.features.map((feat, idx) => (
+                {(product.features || []).map((feat: string, idx: number) => (
                   <div key={idx} className="flex items-start gap-2.5 text-xs font-mono text-stone-700">
                     <CheckCircle2 className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
                     <span>{feat}</span>
@@ -212,13 +238,13 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 <span>Materials & Finishes</span>
               </div>
               <ul className="space-y-2 text-xs font-mono text-stone-700">
-                {product.materials.map((m) => (
+                {(product.materials || []).map((m: string) => (
                   <li key={m} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                     <span>{m}</span>
                   </li>
                 ))}
-                {product.finishes.map((f) => (
+                {(product.finishes || []).map((f: string) => (
                   <li key={f} className="flex items-center gap-2 text-stone-500">
                     <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                     <span>{f}</span>
@@ -234,7 +260,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 <span>Hardware Components</span>
               </div>
               <ul className="space-y-2 text-xs font-mono text-stone-700">
-                {product.hardware.map((h) => (
+                {(product.hardware || []).map((h: string) => (
                   <li key={h} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                     <span>{h}</span>
@@ -250,7 +276,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                 <span>Recommended Applications</span>
               </div>
               <ul className="space-y-2 text-xs font-mono text-stone-700">
-                {product.applications.map((a) => (
+                {(product.applications || []).map((a: string) => (
                   <li key={a} className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                     <span>{a}</span>
@@ -282,7 +308,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
-            {relatedProducts.map((rel) => (
+            {(relatedProducts || []).map((rel: any) => (
               <Link
                 key={rel.modelNumber}
                 href={`/collection/${rel.slug}`}
@@ -293,12 +319,15 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
                     style={{ position: "relative" }}
                     className="relative w-full h-48 bg-stone-50 rounded-xl overflow-hidden mb-4"
                   >
-                    <Image
-                      src={rel.heroImage}
+                    <BackendImage
+                      src={rel.heroImage?.startsWith("/images/") ? "" : rel.heroImage}
                       alt={rel.name}
                       fill
-                      className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+                      objectFit="contain"
+                      className="p-4 group-hover:scale-105 transition-transform duration-500"
                       sizes="350px"
+                      fallbackLabel={rel.name}
+                      loadingLabel="Loading..."
                     />
                   </div>
                   <span className="text-[10px] font-mono uppercase text-stone-400">

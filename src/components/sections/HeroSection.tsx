@@ -2,10 +2,26 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { BackendImage } from "@/components/ui/BackendImage";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  content?: {
+    heroHeadline?: string;
+    heroSubheadline?: string;
+    heroTagline?: string;
+    heroImage?: string;
+  };
+}
+
+export function HeroSection({ content }: HeroSectionProps) {
+  const headline = content?.heroHeadline || "EXPERIENCE LIFE";
+  const subheadline = content?.heroSubheadline || "Furniture for Every Space";
+  const tagline =
+    content?.heroTagline ||
+    "Thoughtful designs. Functional spaces. Lasting quality. Engineered around the functional demands of modern offices, homes and commercial projects.";
+  const heroImage = content?.heroImage || "";
+
   return (
     <section className="relative min-h-screen flex flex-col justify-between pt-32 pb-16 px-6 md:px-12 bg-[#FAF8F5] overflow-hidden border-b border-stone-200/60">
       {/* Background Architectural Blueprint Lines */}
@@ -22,20 +38,26 @@ export function HeroSection() {
               </span>
             </div>
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-editorial font-bold tracking-tighter text-stone-950 uppercase leading-none">
-              EXPERIENCE
-              <br />
-              <span className="font-serif italic font-normal text-amber-900/90 lowercase text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-normal mr-3">
-                life
-              </span>
+              {headline.includes(" ") ? (
+                <>
+                  {headline.split(" ")[0]}
+                  <br />
+                  <span className="font-serif italic font-normal text-amber-900/90 lowercase text-4xl sm:text-6xl md:text-7xl lg:text-8xl tracking-normal mr-3">
+                    {headline.split(" ").slice(1).join(" ")}
+                  </span>
+                </>
+              ) : (
+                headline
+              )}
             </h1>
           </div>
 
           <div className="max-w-md">
             <p className="font-editorial text-lg md:text-xl text-stone-800 font-medium tracking-tight">
-              Furniture for Every Space
+              {subheadline}
             </p>
             <p className="text-xs md:text-sm text-stone-600 mt-2 font-mono leading-relaxed">
-              Thoughtful designs. Functional spaces. Lasting quality. Engineered around the functional demands of modern offices, homes and commercial projects.
+              {tagline}
             </p>
             <div className="flex flex-wrap items-center gap-4 mt-6">
               <Link
@@ -61,13 +83,16 @@ export function HeroSection() {
           className="relative mt-8 md:mt-12 w-full h-[380px] sm:h-[480px] md:h-[600px] rounded-2xl overflow-hidden bg-stone-100 border border-stone-200/90 shadow-xl group"
           style={{ position: "relative" }}
         >
-          <Image
-            src="/images/lifestyle/hero-editorial.png"
+          <BackendImage
+            src={heroImage}
             alt="Experience Life Executive Work Desk Environment"
             fill
             priority
-            className="object-cover object-center group-hover:scale-102 transition-transform duration-1000 ease-out"
+            objectFit="cover"
+            className="group-hover:scale-102 transition-transform duration-1000 ease-out"
             sizes="(max-width: 1280px) 100vw, 1280px"
+            fallbackLabel="Hero Editorial Image — Upload in Admin"
+            loadingLabel="Loading Hero Visual..."
           />
 
           {/* Overlay Tag */}

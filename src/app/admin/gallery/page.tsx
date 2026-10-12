@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Plus, Edit2, Trash2, Image as ImageIcon, X, Save, Loader2 } from "lucide-react";
 import { initialGallery } from "@/lib/seedData";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 export default function AdminGalleryPage() {
   const [gallery, setGallery] = useState<any[]>(initialGallery);
@@ -15,7 +16,7 @@ export default function AdminGalleryPage() {
     title: "",
     category: "Office Desks",
     modelNumber: "EL-D01",
-    image: "/images/lifestyle/hero-editorial.png",
+    image: "",
     featured: true,
   });
 
@@ -50,7 +51,7 @@ export default function AdminGalleryPage() {
           title: "",
           category: "Office Desks",
           modelNumber: "EL-D01",
-          image: "/images/lifestyle/hero-editorial.png",
+          image: "",
           featured: true,
         });
         fetchGallery();
@@ -128,14 +129,16 @@ export default function AdminGalleryPage() {
               className="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden flex flex-col justify-between"
             >
               <div style={{ position: "relative" }} className="relative w-full h-40 bg-stone-100">
-                <Image
-                  src={g.image || "/images/lifestyle/hero-editorial.png"}
+                <BackendImage
+                  src={g.image?.startsWith("/images/") ? "" : (g.image || "")}
                   alt={g.title}
                   fill
-                  className="object-cover"
+                  objectFit="cover"
                   sizes="250px"
+                  fallbackLabel="Photograph"
+                  loadingLabel="Loading..."
                 />
-                <div className="absolute top-2 left-2 bg-stone-900/80 backdrop-blur-xs text-white text-[9px] font-mono uppercase px-2 py-0.5 rounded-full">
+                <div className="absolute top-2 left-2 z-10 bg-stone-900/80 backdrop-blur-xs text-white text-[9px] font-mono uppercase px-2 py-0.5 rounded-full">
                   {g.category}
                 </div>
               </div>

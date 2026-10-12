@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Plus, Edit2, Trash2, CheckCircle2, XCircle, Loader2, X, Save, ExternalLink } from "lucide-react";
 import { initialProducts, SeedProduct } from "@/lib/seedData";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<SeedProduct[]>(initialProducts);
@@ -148,12 +149,15 @@ export default function AdminProductsPage() {
                 <tr key={p.slug} className="hover:bg-stone-50 transition-colors">
                   <td className="px-6 py-4">
                     <div style={{ position: "relative" }} className="relative w-12 h-12 rounded-lg bg-stone-100 overflow-hidden border border-stone-200">
-                      <Image
-                        src={p.heroImage || p.images?.[0] || "/images/products/executive-work-desk.png"}
+                      <BackendImage
+                        src={p.heroImage?.startsWith("/images/") ? "" : (p.heroImage || p.images?.[0] || "")}
                         alt={p.name}
                         fill
-                        className="object-contain p-1"
+                        objectFit="contain"
+                        className="p-1"
                         sizes="48px"
+                        fallbackLabel=""
+                        loadingLabel=""
                       />
                     </div>
                   </td>

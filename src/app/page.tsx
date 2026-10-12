@@ -27,7 +27,13 @@ async function getPageContent() {
     if (!db) return defaultPageContent;
     const doc = await PageContent.findOne();
     if (!doc) return defaultPageContent;
-    return { ...defaultPageContent, ...doc.toObject() };
+    const data: any = { ...defaultPageContent, ...doc.toObject() };
+    for (const key of Object.keys(data)) {
+      if (typeof data[key] === "string" && data[key].startsWith("/images/")) {
+        data[key] = "";
+      }
+    }
+    return data;
   } catch (error) {
     console.warn("Using default page content due to DB disconnect");
     return defaultPageContent;
@@ -44,7 +50,7 @@ export default async function HomePage() {
 
       <main>
         {/* 1. Hero Section */}
-        <HeroSection />
+        <HeroSection content={content} />
 
         {/* 2. Interactive 3D Scroll Experience */}
         <HeroScroll3D />

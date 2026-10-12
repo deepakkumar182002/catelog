@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 interface AboutSectionProps {
   content?: {
@@ -9,6 +9,7 @@ interface AboutSectionProps {
     aboutParagraph2?: string;
     aboutParagraph3?: string;
     aboutImage?: string;
+    aboutSecondaryImage?: string;
   };
 }
 
@@ -24,27 +25,47 @@ export function AboutSection({ content }: AboutSectionProps) {
   const p3 =
     content?.aboutParagraph3 ||
     "We focus on modern forms, practical functionality, strong construction and material combinations that bring warmth and character to everyday spaces.";
-  const image = content?.aboutImage || "/images/lifestyle/craftsmanship.png";
+  const image = content?.aboutImage || "";
+  const secondaryImage = content?.aboutSecondaryImage || "";
 
   return (
     <section id="about" className="py-28 md:py-36 px-6 md:px-12 bg-[#F6F3ED] border-b border-stone-200/80">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          {/* Left: Lifestyle Photo */}
-          <div className="lg:col-span-5 order-2 lg:order-1">
+          {/* Left: Lifestyle Photos */}
+          <div className="lg:col-span-5 order-2 lg:order-1 space-y-4">
             <div
-              className="relative w-full h-[450px] sm:h-[520px] rounded-2xl overflow-hidden border border-stone-300 shadow-xl group"
+              className="relative w-full h-[400px] sm:h-[480px] rounded-2xl overflow-hidden border border-stone-300 shadow-xl group bg-stone-100"
               style={{ position: "relative" }}
             >
-              <Image
+              <BackendImage
                 src={image}
                 alt="Experience Life Studio Construction & Materials"
                 fill
-                className="object-cover group-hover:scale-103 transition-transform duration-700 ease-out"
+                objectFit="cover"
+                className="group-hover:scale-103 transition-transform duration-700 ease-out"
                 sizes="(max-width: 1024px) 100vw, 500px"
+                fallbackLabel="About Craftsmanship Photo — Upload in Admin"
+                loadingLabel="Loading Studio Photo..."
               />
-              <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors duration-500" />
+              <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors duration-500 pointer-events-none" />
             </div>
+
+            {secondaryImage && (
+              <div
+                className="relative w-full h-[180px] rounded-xl overflow-hidden border border-stone-300 shadow-md bg-stone-100"
+                style={{ position: "relative" }}
+              >
+                <BackendImage
+                  src={secondaryImage}
+                  alt="Studio Architecture Detail"
+                  fill
+                  objectFit="cover"
+                  sizes="(max-width: 1024px) 100vw, 500px"
+                  loadingLabel="Loading Detail Photo..."
+                />
+              </div>
+            )}
           </div>
 
           {/* Right: Story */}
@@ -56,7 +77,7 @@ export function AboutSection({ content }: AboutSectionProps) {
               {heading}
             </h2>
             <div className="w-16 h-[2px] bg-stone-900 my-8" />
-            
+
             <p className="text-stone-800 text-base md:text-lg leading-relaxed font-sans">
               {p1}
             </p>

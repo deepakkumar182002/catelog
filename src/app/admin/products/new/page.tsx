@@ -15,7 +15,7 @@ export default function NewProductPage() {
     category: "Work Desks",
     shortDescription: "",
     longDescription: "",
-    heroImage: "/images/products/executive-work-desk.png",
+    heroImage: "",
     dimensions: {
       length: "5 ft / 60 inch",
       width: "2 ft / 24 inch",

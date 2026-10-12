@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Plus, Edit2, Trash2, CheckCircle2, XCircle, Layers, X, Save, Loader2 } from "lucide-react";
 import { initialMaterials } from "@/lib/seedData";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 export default function AdminMaterialsPage() {
   const [materials, setMaterials] = useState<any[]>(initialMaterials);
@@ -16,7 +17,7 @@ export default function AdminMaterialsPage() {
     type: "wood",
     tone: "#C49A6C",
     description: "",
-    image: "/images/materials/oak.png",
+    image: "",
     isAvailable: true,
   });
 
@@ -52,7 +53,7 @@ export default function AdminMaterialsPage() {
           type: "wood",
           tone: "#C49A6C",
           description: "",
-          image: "/images/materials/oak.png",
+          image: "",
           isAvailable: true,
         });
         fetchMaterials();
@@ -132,14 +133,16 @@ export default function AdminMaterialsPage() {
             >
               <div>
                 <div style={{ position: "relative" }} className="relative w-full h-36 bg-stone-100">
-                  <Image
-                    src={m.image || "/images/materials/oak.png"}
+                  <BackendImage
+                    src={m.image?.startsWith("/images/") ? "" : (m.image || "")}
                     alt={m.name}
                     fill
-                    className="object-cover"
+                    objectFit="cover"
                     sizes="300px"
+                    fallbackLabel="Texture Preview"
+                    loadingLabel="Loading..."
                   />
-                  <div className="absolute top-3 right-3 bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full">
+                  <div className="absolute top-3 right-3 z-10 bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full">
                     {m.type}
                   </div>
                 </div>

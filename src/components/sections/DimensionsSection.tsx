@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 interface DimensionsSectionProps {
   content?: {
@@ -9,6 +9,10 @@ interface DimensionsSectionProps {
     dimensionsModel?: string;
     dimensionsHeading?: string;
     dimensionsSubheading?: string;
+    dimensionsBlueprintImage?: string;
+    dimensionsFrontImage?: string;
+    dimensionsSideImage?: string;
+    dimensionsTopImage?: string;
   };
 }
 
@@ -23,14 +27,32 @@ export function DimensionsSection({ content }: DimensionsSectionProps) {
     "Standard size with custom dimensional scaling available to match specific architectural room layouts.";
 
   const views = [
-    { id: "blueprint", label: "Full Technical Drawing", image: "/images/technical/desk-dimensions.png" },
-    { id: "front", label: "Front Elevation", image: "/images/technical/desk-front-view.png" },
-    { id: "side", label: "Side Elevation", image: "/images/technical/desk-side-view.png" },
-    { id: "top", label: "Plan / Top View", image: "/images/technical/desk-top-view.png" },
+    {
+      id: "blueprint",
+      label: "Full Technical Drawing",
+      image: content?.dimensionsBlueprintImage || "",
+    },
+    {
+      id: "front",
+      label: "Front Elevation",
+      image: content?.dimensionsFrontImage || "",
+    },
+    {
+      id: "side",
+      label: "Side Elevation",
+      image: content?.dimensionsSideImage || "",
+    },
+    {
+      id: "top",
+      label: "Plan / Top View",
+      image: content?.dimensionsTopImage || "",
+    },
   ];
 
+  const currentView = views.find((v) => v.id === activeView) || views[0];
+
   return (
-    <section className="py-28 md:py-36 px-6 md:px-12 bg-[#FAF8F5] border-b border-stone-200/80">
+    <section id="dimensions" className="py-28 md:py-36 px-6 md:px-12 bg-[#FAF8F5] border-b border-stone-200/80">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-12 border-b border-stone-300">
@@ -116,27 +138,27 @@ export function DimensionsSection({ content }: DimensionsSectionProps) {
 
           {/* Right Column: Blueprint Graphic Display */}
           <div className="lg:col-span-8">
-            <div className="relative w-full h-[420px] sm:h-[500px] rounded-2xl bg-white border border-stone-300 shadow-xl overflow-hidden p-6 md:p-10 flex flex-col items-center justify-center bg-grid-pattern">
+            <div className="relative w-full h-[420px] sm:h-[500px] rounded-2xl bg-white border border-stone-300 shadow-xl overflow-hidden p-6 md:p-10 flex flex-col items-center justify-between bg-grid-pattern">
               <div
-                className="relative w-full h-full max-h-[420px]"
+                className="relative w-full h-full max-h-[380px] flex items-center justify-center"
                 style={{ position: "relative" }}
               >
-                <Image
-                  src={
-                    views.find((v) => v.id === activeView)?.image ||
-                    "/images/technical/desk-dimensions.png"
-                  }
-                  alt={`Technical Drawing - ${activeView}`}
+                <BackendImage
+                  key={currentView.id}
+                  src={currentView.image}
+                  alt={`Technical Drawing - ${currentView.label}`}
                   fill
-                  className="object-contain transition-opacity duration-500"
+                  objectFit="contain"
                   sizes="(max-width: 1024px) 100vw, 800px"
+                  fallbackLabel={`${currentView.label} — Upload in Admin`}
+                  loadingLabel={`Loading ${currentView.label}...`}
                 />
               </div>
 
               <div className="w-full pt-4 border-t border-stone-200 flex items-center justify-between text-xs font-mono text-stone-500">
                 <span>Scale: 1:20 Metric / Imperial Reference</span>
                 <span className="uppercase text-stone-900 font-semibold">
-                  {views.find((v) => v.id === activeView)?.label}
+                  {currentView.label}
                 </span>
               </div>
             </div>

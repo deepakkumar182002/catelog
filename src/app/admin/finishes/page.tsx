@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Plus, Edit2, Trash2, Palette, X, Save, Loader2 } from "lucide-react";
 import { initialFinishes } from "@/lib/seedData";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 export default function AdminFinishesPage() {
   const [finishes, setFinishes] = useState<any[]>(initialFinishes);
@@ -16,7 +17,7 @@ export default function AdminFinishesPage() {
     code: "",
     ralCode: "",
     description: "",
-    image: "/images/finishes/matte-black.png",
+    image: "",
     isAvailable: true,
   });
 
@@ -52,7 +53,7 @@ export default function AdminFinishesPage() {
           code: "",
           ralCode: "",
           description: "",
-          image: "/images/finishes/matte-black.png",
+          image: "",
           isAvailable: true,
         });
         fetchFinishes();
@@ -140,12 +141,15 @@ export default function AdminFinishesPage() {
                 </div>
 
                 <div style={{ position: "relative" }} className="relative w-full h-28 rounded-xl bg-stone-50 border border-stone-200 overflow-hidden mb-4">
-                  <Image
-                    src={f.image || "/images/finishes/matte-black.png"}
+                  <BackendImage
+                    src={f.image?.startsWith("/images/") ? "" : (f.image || "")}
                     alt={f.name}
                     fill
-                    className="object-contain p-2"
+                    objectFit="contain"
+                    className="p-2"
                     sizes="250px"
+                    fallbackLabel="Finish Preview"
+                    loadingLabel="Loading..."
                   />
                 </div>
 

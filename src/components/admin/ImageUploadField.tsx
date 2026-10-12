@@ -18,7 +18,7 @@ export function ImageUploadField({
   value,
   onChange,
   folder = "experience-life",
-  placeholder = "/images/products/... or https://res.cloudinary.com/...",
+  placeholder = "https://res.cloudinary.com/... or upload file",
   recommendedSize,
 }: ImageUploadFieldProps) {
   const [isUploading, setIsUploading] = useState(false);

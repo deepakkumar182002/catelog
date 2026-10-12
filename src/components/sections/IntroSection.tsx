@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import { BackendImage } from "@/components/ui/BackendImage";
 
 interface IntroSectionProps {
   content?: {
@@ -26,7 +26,7 @@ export function IntroSection({ content }: IntroSectionProps) {
   const pillar1 = content?.philosophyPillar1 || "Thoughtful";
   const pillar2 = content?.philosophyPillar2 || "Functional";
   const pillar3 = content?.philosophyPillar3 || "Enduring";
-  const image = content?.philosophyImage || "/images/lifestyle/workspace-space.png";
+  const image = content?.philosophyImage || "";
 
   return (
     <section className="py-28 md:py-36 px-6 md:px-12 bg-[#F6F3ED] border-b border-stone-200/80">
@@ -80,18 +80,21 @@ export function IntroSection({ content }: IntroSectionProps) {
           {/* Right Column: Architectural Image Display */}
           <div className="lg:col-span-6">
             <div
-              className="relative w-full h-[450px] sm:h-[550px] rounded-2xl overflow-hidden shadow-2xl border border-stone-300"
+              className="relative w-full h-[450px] sm:h-[550px] rounded-2xl overflow-hidden shadow-2xl border border-stone-300 bg-stone-100"
               style={{ position: "relative" }}
             >
-              <Image
+              <BackendImage
                 src={image}
                 alt="Experience Life Architectural Workspace"
                 fill
-                className="object-cover object-center hover:scale-103 transition-transform duration-700 ease-out"
+                objectFit="cover"
+                className="hover:scale-103 transition-transform duration-700 ease-out"
                 sizes="(max-width: 1024px) 100vw, 600px"
+                fallbackLabel="Design Philosophy Photo — Upload in Admin"
+                loadingLabel="Loading Architecture Photo..."
               />
-              <div className="absolute inset-0 bg-linear-to-t from-stone-950/60 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 text-white">
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-6 left-6 right-6 text-white pointer-events-none">
                 <span className="text-[10px] font-mono tracking-widest uppercase text-amber-200">
                   Designed for Modern Living
                 </span>
